@@ -17,7 +17,8 @@ namespace ClienteServicio.Repository
             return _customerContext.Services.Select(c => new Services()
             {
                 idservice = c.idservice,
-                service = c.service
+                service = c.service,
+                idarea = c.idarea,
             }).ToList();
         }
 

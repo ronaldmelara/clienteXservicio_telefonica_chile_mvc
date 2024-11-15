@@ -7,5 +7,6 @@ namespace ClienteServicio.Models
         [Key]
         public int idservice { get; set; }
         public string service { get; set; }
+        public int idarea { get; set; }
     }
 }

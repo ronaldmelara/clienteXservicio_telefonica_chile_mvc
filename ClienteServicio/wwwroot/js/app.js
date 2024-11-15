@@ -1,5 +1,4 @@
 "use strict";
-// Scripts/app.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,10 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-//import { extend } from "jquery";
+let ListServices = [];
+let colsCloud = [];
+let colsCyber = [];
 // Ejecuta la función saludo() cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', () => {
-    obtenerDatos()
+    obtenerServicios().then(() => {
+        //console.log(ListServices);
+        ListServices.forEach((service) => {
+        });
+    });
+    obtenerClientesServicios()
         .then(data => {
         const columnasDinamicas = Object.keys(data[0]).map((key, index) => ({
             title: key, // El nombre de la columna será la clave del objeto
@@ -24,12 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Si el valor es un booleano, renderizar un checkbox
                 if (typeof data === 'boolean') {
                     return `<div class="form-check form-switch"><input class="form-check-input"  ${data ? 'checked' : ''} type="checkbox" disabled></div>`;
-                    //if (data) {
-                    //    return `<input type="checkbox" class="checkbox" disabled>`;
-                    //} else {
-                    //    return `<input type="checkbox" class="checkbox" disabled>`;
-                    //}
-                    //return `<input type="checkbox" class="checkbox" ${data ? 'checked disabled' : 'disabled'}>`;
                 }
                 // Para otros valores, retornar el dato tal cual
                 return data;
@@ -43,12 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
             className: 'dt-center editor-edit', // Para centrar el contenido
             orderable: false, // No ordenable
             render: function (data, type, row, meta) {
-                //debugger;
-                //return '<button class="btn btn-primary" onclick="openWindow('+ row.id +', \''+ row.cliente+'\');"><i class="fa fa-pencil"></i></button>';
                 return '<button class="btn btn-primary edit-btn" data-status="none"><i class="fa fa-pencil"></i></button>';
             }
         });
-        console.log('Datos recibidos:', data); // Datos procesados
         var table = $("#miTabla").DataTable({
             data: data,
             columns: columnasDinamicas,
@@ -93,62 +90,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = $(this).closest('tr');
             // Encontrar todos los checkboxes dentro de la fila
             const checkboxes = row.find('input[type="checkbox"]');
-            console.log(btn.attr("data-status"));
             if (btn.attr("data-status") === 'none') {
-         
                 btn.attr('data-status', "editing");
-                console.log(btn.attr("data-status"));
                 // Asegúrate de que el índice (2) corresponde a la columna correcta
                 checkboxes.removeClass('disabled').addClass('enabled');
                 btn.removeClass('btn-primary').addClass('btn-danger');
                 // Habilitar todos los checkboxes en esa fila
                 checkboxes.prop('disabled', false);
-                btn.find('i').removeClass('fa-pencil').addClass('fa-save');
                 return;
             }
             if (btn.attr("data-status") === 'editing') {
                 btn.attr('data-status', "none");
-                console.log(btn.attr("data-status"));
                 // Asegúrate de que el índice (2) corresponde a la columna correcta
                 checkboxes.removeClass('enabled').addClass('disabled');
                 btn.removeClass('btn-danger').addClass('btn-primary');
                 // Habilitar todos los checkboxes en esa fila
                 checkboxes.prop('disabled', true);
-                btn.find('i').removeClass('fa-save').addClass('fa-pencil');
                 return;
             }
         });
-        $('#miTabla_wrapper').on('click', '.colvisGroup', function () {
+        $('#miTabla_wrapper').on('click', '.colvisGroup', function (e, button, config) {
             var btns = $('.colvisGroup');
             btns.removeClass('selected');
             $(this).addClass('selected');
+            $("#miTabla").DataTable().draw();
         });
-        table.on('column-visibility.dt', function (e, settings, column, state) {
-        });
-        function updateColvisButtonState() {
-            var btns = $('.colvisGroup'); // Obtener todos los botones de colvisGroup
-            // Iteramos sobre cada botón de colvisGroup y verificamos el estado de visibilidad de las columnas correspondientes
-            btns.each(function () {
-                var btn = $(this);
-                var btnText = btn.text().trim();
-                var isActive = false;
-                // Revisamos los grupos de columnas y verificamos si todas las columnas de ese grupo están visibles
-                table.settings()[0].oInit.colVis.groups.forEach(function (group) {
-                    if (group.text === btnText) {
-                        isActive = group.show.every(function (idx) {
-                            return table.column(idx).visible(); // Verificar si todas las columnas de este grupo están visibles
-                        });
-                    }
-                });
-                // Si el grupo está activo, le añadimos la clase 'selected' al botón
-                if (isActive) {
-                    btn.addClass('selected');
-                }
-                else {
-                    btn.removeClass('selected');
-                }
-            });
-        }
     })
         .catch(error => {
         console.error('Error:', error); // Error manejado
@@ -156,20 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Detectar el cambio de visibilidad y actualizar los botones
     ;
 });
-function openWindow(id, name) {
-    const button = document.getElementById('openModalButton');
-    const modalElement = document.getElementById('myModal');
-    // Asegúrate de que el modal se puede mostrar correctamente
-    const modal = new bootstrap.Modal(modalElement);
-    const title = document.getElementById('modalCustomer');
-    title.innerText = name;
-    // Evento que abre el modal cuando el botón es presionado
-    //button.addEventListener('click', () => {
-    cargarDatosCliente();
-    modal.show();
-    //});
-}
-function obtenerDatos() {
+function obtenerClientesServicios() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const response = yield fetch('/Home/GetAllContracts'); // Hacemos la solicitud GET
@@ -177,7 +130,6 @@ function obtenerDatos() {
                 throw new Error('Error en la solicitud');
             }
             const data = yield response.json(); // Convertimos la respuesta a JSON
-            console.log(data);
             return data; // Devolvemos los datos
         }
         catch (error) {
@@ -185,36 +137,20 @@ function obtenerDatos() {
         }
     });
 }
-function cargarDatosCliente() {
-    // Declarar la constante y tiparla correctamente
-    const data2 = {
-        data: [
-            {
-                idCliente: 1,
-                idServicio: 1,
-                nombre: "Azure"
-            },
-            {
-                idCliente: 1,
-                idServicio: 9,
-                nombre: "OneInbox"
+function obtenerServicios() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const response = yield fetch('/Home/GetAllServices'); // Hacemos la solicitud GET
+            if (!response.ok) {
+                throw new Error('Error en la solicitud');
             }
-        ]
-    };
-    if ($.fn.DataTable.isDataTable('#miTablaMantenedor')) {
-        $('#miTablaMantenedor').DataTable().destroy();
-    }
-    $('#miTablaMantenedor tbody').empty();
-    $("#miTablaMantenedor").DataTable({
-        data: data2.data,
-        columns: [
-            { data: 'idCliente', name: "Id", visible: false },
-            { data: 'idServicio', name: "Id Servicio", visible: false },
-            { data: 'nombre', name: "Servicio" }
-        ],
-        scrollX: true, // Permite el desplazamiento horizontal
-        /* scrollY: '400px',*/ // Ajusta la altura de la tabla si es necesario
-        scrollCollapse: true,
-        responsive: true // Asegura que la tabla se vea bien en dispositivos móviles
+            const data = yield response.json(); // Convertimos la respuesta a JSON
+            ListServices = Array.from(data);
+            return ListServices; // Devolvemos los datos
+        }
+        catch (error) {
+            console.error('Error al llamar la API:', error);
+            return [];
+        }
     });
 }

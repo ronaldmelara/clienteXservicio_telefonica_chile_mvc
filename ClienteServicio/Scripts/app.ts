@@ -1,13 +1,26 @@
-﻿// Scripts/app.ts
+﻿interface Service {
+    idservice: number,
+    service: string,
+    idarea: number
+}
 
-//import { extend } from "jquery";
-
+let ListServices: Service[] = [];
+let colsCloud: number[] = [];
+let colsCyber: number[] = [];
 
 // Ejecuta la función saludo() cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', () => {
 
 
-    obtenerDatos()
+    obtenerServicios().then(() => {
+        //console.log(ListServices);
+        ListServices.forEach((service) => {
+
+        });
+    });
+
+
+    obtenerClientesServicios()
         .then(data => {
 
             const columnasDinamicas = Object.keys(data[0]).map((key, index) => ({
@@ -21,13 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (typeof data === 'boolean') {
                       
                         return `<div class="form-check form-switch"><input class="form-check-input"  ${ data? 'checked' : ''} type="checkbox" disabled></div>`;
-
-                        //if (data) {
-                        //    return `<input type="checkbox" class="checkbox" disabled>`;
-                        //} else {
-                        //    return `<input type="checkbox" class="checkbox" disabled>`;
-                        //}
-                        //return `<input type="checkbox" class="checkbox" ${data ? 'checked disabled' : 'disabled'}>`;
                     }
                     // Para otros valores, retornar el dato tal cual
                     return data;
@@ -42,13 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 className: 'dt-center editor-edit', // Para centrar el contenido
                 orderable: false,                // No ordenable
                 render: function (data: any, type: string, row: any, meta: any) {
-                    //debugger;
-                    //return '<button class="btn btn-primary" onclick="openWindow('+ row.id +', \''+ row.cliente+'\');"><i class="fa fa-pencil"></i></button>';
                     return '<button class="btn btn-primary edit-btn" data-status="none"><i class="fa fa-pencil"></i></button>';
                 }
             });
 
-            console.log('Datos recibidos:', data);  // Datos procesados
             var table = $("#miTabla").DataTable({
                 data: data,
                 columns: columnasDinamicas,
@@ -95,11 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = $(this).closest('tr');
                 // Encontrar todos los checkboxes dentro de la fila
                 const checkboxes = row.find('input[type="checkbox"]');
-                console.log(btn.attr("data-status"));
+           
                 if (btn.attr("data-status") === 'none') {
-                    debugger;
+
                     btn.attr('data-status', "editing");
-                    console.log(btn.attr("data-status"));
+    
                     // Asegúrate de que el índice (2) corresponde a la columna correcta
                     checkboxes.removeClass('disabled').addClass('enabled');
                     btn.removeClass('btn-primary').addClass('btn-danger');
@@ -109,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (btn.attr("data-status") === 'editing') {
                     btn.attr('data-status', "none");
-                    console.log(btn.attr("data-status"));
+     
                     // Asegúrate de que el índice (2) corresponde a la columna correcta
                     checkboxes.removeClass('enabled').addClass('disabled');
                     btn.removeClass('btn-danger').addClass('btn-primary');
@@ -119,45 +122,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            $('#miTabla_wrapper').on('click', '.colvisGroup', function () {
+            $('#miTabla_wrapper').on('click', '.colvisGroup', function (e, button, config) {
                 var btns = $('.colvisGroup');
+            
                 btns.removeClass('selected');
                 $(this).addClass('selected');
+
+                $("#miTabla").DataTable().draw();
             });
 
-            table.on('column-visibility.dt', function (e, settings, column, state) {
-                
-            });
-
-            function updateColvisButtonState() {
-                var btns = $('.colvisGroup');  // Obtener todos los botones de colvisGroup
-
-                // Iteramos sobre cada botón de colvisGroup y verificamos el estado de visibilidad de las columnas correspondientes
-                btns.each(function () {
-                    var btn = $(this);
-                    var btnText = btn.text().trim();
-
-                    var isActive = false;
-
-                    // Revisamos los grupos de columnas y verificamos si todas las columnas de ese grupo están visibles
-                    table.settings()[0].oInit.colVis.groups.forEach(function (group) {
-                        if (group.text === btnText) {
-                            isActive = group.show.every(function (idx) {
-                                return table.column(idx).visible();  // Verificar si todas las columnas de este grupo están visibles
-                            });
-                        }
-                    });
-
-                    // Si el grupo está activo, le añadimos la clase 'selected' al botón
-                    if (isActive) {
-                        btn.addClass('selected');
-                    } else {
-                        btn.removeClass('selected');
-                    }
-                });
-            }
-
-
+         
         })
         .catch(error => {
             console.error('Error:', error);  // Error manejado
@@ -171,29 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ;
 });
 
-
-
-
-function openWindow(id:number, name:string) {
-    const button = document.getElementById('openModalButton') as HTMLButtonElement;
-    const modalElement = document.getElementById('myModal') as HTMLElement;
-
-    // Asegúrate de que el modal se puede mostrar correctamente
-    const modal = new bootstrap.Modal(modalElement);
-
-    const title = document.getElementById('modalCustomer') as HTMLTitleElement;
-    title.innerText = name;
-
-    // Evento que abre el modal cuando el botón es presionado
-    //button.addEventListener('click', () => {
-
-    cargarDatosCliente();
-        modal.show();
-    //});
-}
-
-
-async function obtenerDatos() {
+async function obtenerClientesServicios() {
     try {
         const response = await fetch('/Home/GetAllContracts');  // Hacemos la solicitud GET
         if (!response.ok) {
@@ -202,57 +154,26 @@ async function obtenerDatos() {
        
         const data = await response.json();  // Convertimos la respuesta a JSON
 
-        console.log(data);
         return data;  // Devolvemos los datos
     } catch (error) {
         console.error('Error al llamar la API:', error);
     }
 }
 
-function cargarDatosCliente() {
+async function obtenerServicios(): Promise<Service[]> {
+    try {
+        const response = await fetch('/Home/GetAllServices');  // Hacemos la solicitud GET
+        if (!response.ok) {
+            throw new Error('Error en la solicitud');
+        }
 
-    // Definir la interfaz para los objetos dentro del arreglo
-    interface Servicio {
-        idCliente: number;
-        idServicio: number;
-        nombre: string;
+        const data = await response.json();  // Convertimos la respuesta a JSON
+
+        ListServices = Array.from(data);
+        
+        return ListServices;  // Devolvemos los datos
+    } catch (error) {
+        console.error('Error al llamar la API:', error);
+        return [];
     }
-
-    // Declarar la constante y tiparla correctamente
-    const data2: { data: Servicio[] } = {
-        data: [
-            {
-                idCliente: 1,
-                idServicio: 1,
-                nombre: "Azure"
-            },
-            {
-                idCliente: 1,
-                idServicio: 9,
-                nombre: "OneInbox"
-            }
-        ]
-    };
-
-    if ($.fn.DataTable.isDataTable('#miTablaMantenedor')) {
-        $('#miTablaMantenedor').DataTable().destroy();
-    }
-
-    $('#miTablaMantenedor tbody').empty();
-
-    $("#miTablaMantenedor").DataTable({
-        data: data2.data,
-        columns: [
-            { data: 'idCliente', name: "Id", visible: false },
-            { data: 'idServicio', name: "Id Servicio", visible: false },
-            { data: 'nombre' , name: "Servicio"}
-        ],
-
-        scrollX: true,    // Permite el desplazamiento horizontal
-        /* scrollY: '400px',*/     // Ajusta la altura de la tabla si es necesario
-        scrollCollapse: true,
-
-        responsive: true  // Asegura que la tabla se vea bien en dispositivos móviles
-    }as any);
-
 }
