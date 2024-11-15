@@ -1,0 +1,112 @@
+﻿/* Estilo para checkboxes marcados (true) */
+.checkbox:checked {
+    background-color: #007bff; /* Azul para indicar que está seleccionado */
+    border-color: #007bff; /* Borde azul */
+    cursor: not-allowed; /* Deshabilitar la interacción */
+}
+
+/* Estilo para checkboxes desmarcados (false) */
+.checkbox:disabled {
+    background-color: #dcdcdc; /* Gris claro para los deshabilitados */
+    border-color: #a8a8a8; /* Borde gris */
+    cursor: not-allowed; /* Deshabilitado visualmente */
+}
+
+.checkmark {
+    display: inline-block;
+    transform: rotate(45deg);
+    height: 14px;
+    width: 7px;
+    margin-left: 10%;
+    border-bottom: 4px solid #78b13f;
+    border-right: 4px solid #78b13f;
+}
+
+table {
+    margin: 0 auto;
+    width: 100%;
+    clear: both;
+    border-collapse: collapse;
+    table-layout: fixed;
+    // ***********add this word-wrap:break-word;
+    // ***********and this
+}
+
+.colum {
+    text-transform: uppercase;
+    text-wrap: wrap;
+    text-align: start;
+}
+
+/* Cuando el elemento está habilitado */
+.enabled {
+    cursor: pointer;
+}
+
+/* Cuando el elemento está deshabilitado */
+.disabled {
+    cursor: not-allowed; /* Puedes usar 'default' si prefieres la flecha estándar */
+    opacity: 0.6; /* También puedes agregar opacidad para dar una apariencia de deshabilitado */
+}
+
+
+
+
+
+/* Estilo para los botones no seleccionados */
+.colvisGroup {
+    background-color: #f8f9fa !important;
+    color: #495057 !important;
+    border: 1px solid #ced4da !important;
+}
+
+    .colvisGroup:hover {
+        background-color: #e9ecef;
+    }
+
+    /* Opcional: Estilo para cuando el cursor pasa por encima */
+    .colvisGroup:hover {
+        cursor: pointer;
+    }
+
+/* Estilo para los botones activos (seleccionados) */
+    .colvisGroup.selected {
+        background-color: #007bff !important;
+        color: white !important;
+        border: 1px solid #0056b3 !important;
+    }
+
+
+
+/* Estilo para el checkbox deshabilitado (gris) */
+.form-check-input:disabled {
+    background-color: #ddd !important; /* Gris de fondo cuando está deshabilitado */
+    border-color: #ddd !important; /* Gris de borde cuando está deshabilitado */
+}
+
+/* Estilo para el checkbox NO marcado pero habilitado */
+.form-check-input:not(:checked):enabled {
+    background-color: #ffc107 !important; /* Color naranja cuando NO está marcado pero habilitado */
+    border-color: #ffc107 !important; /* Borde naranja cuando NO está marcado pero habilitado */
+}
+
+/* Estilo para el checkbox marcado y habilitado */
+.form-check-input:checked:enabled {
+    background-color: #28a745 !important; /* Color verde cuando está marcado y habilitado */
+    border-color: #28a745 !important; /* Borde verde cuando está marcado y habilitado */
+}
+
+/* Estilo del círculo del switch (el "slider") cuando está deshabilitado */
+.form-check-input:disabled::before {
+    background-color: #aaa !important; /* El círculo del switch será gris cuando está deshabilitado */
+}
+
+/* Estilo del círculo del switch cuando está marcado */
+.form-check-input:checked:enabled::before {
+    background-color: #fff !important; /* El círculo dentro del switch será blanco cuando está marcado */
+}
+
+/* Estilo del círculo del switch cuando NO está marcado pero habilitado */
+.form-check-input:not(:checked):enabled::before {
+    background-color: #fff !important; /* El círculo dentro del switch será blanco cuando NO está marcado */
+}
