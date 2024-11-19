@@ -3,6 +3,12 @@
     readonly service: string,
     readonly idarea: number
 }
+
+interface Contract {
+    idservice: number;
+    idcustomer: number;
+    active: number;
+}
 enum Area {
     Cloud = 1,
     Cyber = 2,
@@ -49,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 width: index === 1 ? '350px' : 'auto', // Aplica ancho fijo solo a la segunda columna (índice 1)
                 className: index === 1 ? 'colum' : '',
                 orderable: false,
-                render: (data: any) => (typeof data === 'boolean' ? renderCheckbox(data) :data),
+                render: (data: any) => (typeof data === 'boolean' ? renderCheckbox(data, key) :data),
             }));
 
             // Insertar la columna de icono de edición al principio del array
@@ -59,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 width: 'auto',
                 className: 'dt-center editor-edit', // Para centrar el contenido
                 orderable: false,                // No ordenable
-                render:  () => '<button class="btn btn-primary edit-btn" data-status="none"><i class="fa fa-pencil"></i></button>'
+                render:  () => '<button class="btn btn-primary edit-btn" data-status="none" id="btnEdit"><i class="fa fa-pencil"></i></button>'
             });
 
             var table = $("#miTabla").DataTable({
@@ -102,34 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } as any); 
 
-            $('#miTabla tbody').on('click', '.edit-btn', function () {
-                const btn = $(this);
-                // Obtener la fila que contiene el botón editado
-                const row = $(this).closest('tr');
-                // Encontrar todos los checkboxes dentro de la fila
-                const checkboxes = row.find('input[type="checkbox"]');
-           
-                if (btn.attr("data-status") === 'none') {
-
-                    btn.attr('data-status', "editing");
-    
-                    // Asegúrate de que el índice (2) corresponde a la columna correcta
-                    checkboxes.removeClass('disabled').addClass('enabled');
-                    btn.removeClass('btn-primary').addClass('btn-danger');
-                    // Habilitar todos los checkboxes en esa fila
-                    checkboxes.prop('disabled', false);
-                    return;
-                }
-                if (btn.attr("data-status") === 'editing') {
-                    btn.attr('data-status', "none");
-     
-                    // Asegúrate de que el índice (2) corresponde a la columna correcta
-                    checkboxes.removeClass('enabled').addClass('disabled');
-                    btn.removeClass('btn-danger').addClass('btn-primary');
-                    // Habilitar todos los checkboxes en esa fila
-                    checkboxes.prop('disabled', true);
-                    return;
-                }
+            $('#miTabla tbody').on('click', '#btnEdit', function () {
+                
+                ConfigCheckboxes(this);
+                
             });
 
             $('#miTabla').on('change', '#cbService', function () {
@@ -201,16 +183,106 @@ async function obtenerServicios(): Promise<Service[]> {
     }
 }
 
-function renderCheckbox(data: boolean): string {
+function renderCheckbox(data: boolean, key:string): string {
     return `
         <div class="form-check form-switch">
             <input 
                 class="form-check-input" 
                 type="checkbox" 
                 id="cbService" 
-                data-status="none" 
+                data-status="none"
+                data-key="${key}"
                 ${data ? 'checked' : ''} 
                 disabled>
         </div>
     `;
+}
+
+function ConfigCheckboxes(button: HTMLButtonElement) {
+    const btn = $(button);
+    // Obtener la fila que contiene el botón editado
+    const row = btn.closest('tr');
+    const clientId = row.find('td').eq(1).text(); // Obtener el ID que está en la segunda celda (índice 1)
+    // Encontrar todos los checkboxes dentro de la fila
+    const checkboxes = row.find('input[type="checkbox"]');
+
+    if (btn.attr("data-status") === 'none') {
+
+        btn.attr('data-status', "editing");
+
+        // Asegúrate de que el índice (2) corresponde a la columna correcta
+        checkboxes.removeClass('disabled').addClass('enabled');
+        btn.removeClass('btn-primary').addClass('btn-danger');
+        // Habilitar todos los checkboxes en esa fila
+        checkboxes.prop('disabled', false);
+    } else if (btn.attr("data-status") === 'editing') {
+        saveChanges(checkboxes, clientId);
+        btn.attr('data-status', "none");
+
+        // Asegúrate de que el índice (2) corresponde a la columna correcta
+        checkboxes.removeClass('enabled').addClass('disabled');
+        btn.removeClass('btn-danger').addClass('btn-primary');
+        // Habilitar todos los checkboxes en esa fila
+        checkboxes.prop('disabled', true);
+
+    }
+
+}
+
+function saveContracts(elems: Contract[]): Promise<any> {
+    return new Promise((resolve, reject) => {
+        // Enviar datos al controlador usando fetch
+        fetch('/Home/SaveContracts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(elems)  // Convierte el array de objetos a JSON
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    // Si la respuesta no es exitosa, rechazamos la promesa
+                    return reject('Error: ' + response.statusText);
+                }
+                return response.json(); // Convertir la respuesta a JSON
+            })
+            .then((data) => {
+                console.log('Success:', data);
+                resolve(data);  // Resolvemos la promesa con los datos
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                reject(error);  // Rechazamos la promesa en caso de error
+            });
+    });
+}
+
+async function saveChanges(checkboxes: any, clientId: string): Promise<void> {
+    let elems: Contract[] = [];
+
+    checkboxes.each(function (this: HTMLInputElement) {
+        const _status = $(this).attr("data-status");
+      
+
+        if (_status === "edited") {
+            const isChecked = $(this).is(':checked');
+            const service = $(this).attr("data-key");
+            const srvSelected = ListServices.find(srv => srv.service === service);
+            if (srvSelected) {
+                elems.push({ idservice: srvSelected.idservice, idcustomer: Number(clientId), active: (isChecked ? 1 : 0) });
+            }
+
+            
+        }
+    });
+
+    try {
+        const data = await saveContracts(elems); // Esperar la promesa
+        console.log('Data saved successfully:', data);
+        // Puedes mostrar un mensaje de éxito aquí
+    } catch (error) {
+        console.error('Error saving contracts:', error);
+        // Maneja el error aquí
+    }
+
 }

@@ -16,5 +16,48 @@ namespace ClienteServicio.Repository
         {
             return _customerContext.GetContracts();
         }
+
+        public Contract GetContract(int serviceId, int customerId)
+        {
+            return _customerContext.Contracts.FirstOrDefault(c => c.idcustomer == customerId && c.idservice == serviceId);
+        }
+
+
+        // Actualizar un contrato
+        public void UpdateContract(Contract updatedContract)
+        {
+
+            try
+            {
+                // Buscar el contrato a actualizar por IdService y IdCustomer
+                var existingContract = _customerContext.Contracts
+                    .FirstOrDefault(c => c.idcustomer == updatedContract.idcustomer && c.idservice == updatedContract.idservice);
+
+                if (existingContract != null)
+                {
+                    // Si el contrato existe, actualiza sus propiedades
+                    existingContract.active = updatedContract.active;
+                    //existingContract.Updated = DateTime.Now;  // Actualiza la fecha de modificación
+
+                    // Puedes agregar aquí más campos que quieras actualizar
+
+                    // Marca el contrato como actualizado (modificado) para que EF lo considere como un cambio
+                    _customerContext.Contracts.Update(existingContract);
+                }
+                else
+                {
+                    // Si no existe, puedes agregar uno nuevo
+                    _customerContext.Contracts.Add(updatedContract);
+                }
+
+                _customerContext.SaveChanges();
+
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+           
+        }
     }
 }

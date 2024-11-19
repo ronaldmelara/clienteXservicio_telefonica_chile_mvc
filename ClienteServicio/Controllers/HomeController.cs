@@ -61,5 +61,45 @@ namespace ClienteServicio.Controllers
             }
             return Ok(data);
         }
+
+        [HttpPost]
+        public IActionResult SaveContracts([FromBody] List<Contract> contracts)
+        {
+            if (contracts == null || contracts.Count == 0)
+            {
+                return BadRequest("No contracts data received");
+            }
+
+            foreach (Contract contract in contracts)
+            {
+                var existingContract = _contractRepository.GetContract(contract.idservice, contract.idcustomer);
+
+                if (existingContract != null) {
+
+                    existingContract.active = contract.active;
+                    existingContract.updated = DateTime.Now;
+                    _contractRepository.UpdateContract(existingContract);
+                }
+                else
+                {
+                    if (contract.active== 1)
+                    {
+                        var newContract = new Contract
+                        {
+                            active = contract.active,
+                            idcustomer = contract.idcustomer,
+                            idservice = contract.idservice,
+                            updated = DateTime.Now
+                        };
+                        _contractRepository.UpdateContract(newContract);
+                    }
+                }
+            }
+
+
+
+
+            return Ok("Contracts saved successfully");
+        }
     }
 }

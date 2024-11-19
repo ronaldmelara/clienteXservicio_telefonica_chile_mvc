@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ClienteServicio.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace ClienteServicio.Data
@@ -11,7 +12,7 @@ namespace ClienteServicio.Data
             myDbContext = this;
         }
 
-        public List<Dictionary<string, object>> GetContracts()
+        public List<Dictionary<string, object>> GetContracts() 
         {
             var result = new List<Dictionary<string, object>>();
 
@@ -52,7 +53,7 @@ namespace ClienteServicio.Data
             return result;
         }
 
-
+        public DbSet<Contract> Contracts { get; set; }
 
     }
 }

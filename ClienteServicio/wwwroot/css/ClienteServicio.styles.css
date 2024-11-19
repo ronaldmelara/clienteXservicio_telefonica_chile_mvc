@@ -96,6 +96,12 @@ table {
     border-color: #28a745 !important; /* Borde verde cuando está marcado y habilitado */
 }
 
+/* Estilo para el checkbox marcado y habilitado */
+.form-check-input:checked:disabled {
+    background-color: #28a745 !important; /* Color verde cuando está marcado y habilitado */
+    border-color: #28a745 !important; /* Borde verde cuando está marcado y habilitado */
+}
+
 /* Estilo del círculo del switch (el "slider") cuando está deshabilitado */
 .form-check-input:disabled::before {
     background-color: #aaa !important; /* El círculo del switch será gris cuando está deshabilitado */
@@ -110,3 +116,5 @@ table {
 .form-check-input:not(:checked):enabled::before {
     background-color: #fff !important; /* El círculo dentro del switch será blanco cuando NO está marcado */
 }
+
+
