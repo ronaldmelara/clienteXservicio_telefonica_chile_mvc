@@ -26,7 +26,6 @@ function getIndexColumns() {
     }
 }
 
-
 // Ejecuta la función saludo() cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', () => {
 
