@@ -10,6 +10,27 @@
     <table id="miTabla" class="table table-striped" style="width:100%">
         
     </table>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmSaveModalLabel">Confirmar Cambios</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas guardar los cambios realizados?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar Cambios</button>
+                    <button type="button" id="confirmSaveBtn" class="btn btn-primary">Confirmar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
    
 </div>
 

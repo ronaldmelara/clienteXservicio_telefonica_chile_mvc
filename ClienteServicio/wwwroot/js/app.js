@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+const cachedRowValues = {};
 var Area;
 (function (Area) {
     Area[Area["Cloud"] = 1] = "Cloud";
@@ -95,16 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ConfigCheckboxes(this);
         });
         $('#miTabla').on('change', '#cbService', function () {
-            const isChecked = $(this).is(':checked');
-            console.log(`Checkbox cambiado: ${isChecked ? 'Activado' : 'Desactivado'}`);
             $(this).attr('data-status', "edited");
-            // Aquí puedes realizar acciones según el estado del checkbox
-            if (isChecked) {
-                console.log('Activado');
-            }
-            else {
-                console.log('Desactivado');
-            }
         });
         $('#miTabla_wrapper').on('click', '.colvisGroup', function (e, button, config) {
             var btns = $('.colvisGroup');
@@ -178,20 +170,46 @@ function ConfigCheckboxes(button) {
     const checkboxes = row.find('input[type="checkbox"]');
     if (btn.attr("data-status") === 'none') {
         btn.attr('data-status', "editing");
+        // Almacenar los valores actuales de los checkboxes en cache
+        const rowValues = {};
+        checkboxes.each((index, element) => {
+            const key = $(element).attr('data-key') || '';
+            const isChecked = $(element).is(':checked');
+            // Guardar el valor original
+            rowValues[key] = isChecked;
+        });
+        cachedRowValues[clientId] = rowValues;
         // Asegúrate de que el índice (2) corresponde a la columna correcta
         checkboxes.removeClass('disabled').addClass('enabled');
         btn.removeClass('btn-primary').addClass('btn-danger');
+        btn.find('i').removeClass("fa-pencil").addClass('fa-save');
         // Habilitar todos los checkboxes en esa fila
         checkboxes.prop('disabled', false);
     }
     else if (btn.attr("data-status") === 'editing') {
-        saveChanges(checkboxes, clientId);
-        btn.attr('data-status', "none");
-        // Asegúrate de que el índice (2) corresponde a la columna correcta
-        checkboxes.removeClass('enabled').addClass('disabled');
-        btn.removeClass('btn-danger').addClass('btn-primary');
-        // Habilitar todos los checkboxes en esa fila
-        checkboxes.prop('disabled', true);
+        // Mostrar modal de confirmación antes de guardar
+        showConfirmModal(() => {
+            saveChanges(checkboxes, clientId);
+            btn.attr('data-status', "none");
+            checkboxes.removeClass('enabled').addClass('disabled');
+            btn.removeClass('btn-danger').addClass('btn-primary');
+            checkboxes.prop('disabled', true);
+            btn.find('i').removeClass("fa-save").addClass('fa-pencil');
+        }, () => {
+            btn.attr('data-status', "none");
+            checkboxes.removeClass('enabled').addClass('disabled');
+            btn.removeClass('btn-danger').addClass('btn-primary');
+            checkboxes.prop('disabled', true);
+            btn.find('i').removeClass("fa-save").addClass('fa-pencil');
+            if (cachedRowValues[clientId]) {
+                const originalValues = cachedRowValues[clientId];
+                checkboxes.each((index, element) => {
+                    const key = $(element).attr('data-key') || '';
+                    $(element).prop('checked', originalValues[key]);
+                    $(element).attr('data-status', "none");
+                });
+            }
+        });
     }
 }
 function saveContracts(elems) {
@@ -245,4 +263,18 @@ function saveChanges(checkboxes, clientId) {
             // Maneja el error aquí
         }
     });
+}
+function showConfirmModal(onConfirm, onCancel) {
+    const modal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
+    modal.show();
+    // Configurar el botón "Confirmar"
+    $('#confirmSaveBtn').off('click').on('click', function () {
+        onConfirm(); // Ejecuta la acción pasada como argumento
+        modal.hide(); // Cierra el modal
+    });
+    if (onCancel) {
+        $('#confirmSaveModal .btn-secondary').off('click').on('click', function () {
+            onCancel(); // Ejecuta la acción pasada como argumento
+        });
+    }
 }
