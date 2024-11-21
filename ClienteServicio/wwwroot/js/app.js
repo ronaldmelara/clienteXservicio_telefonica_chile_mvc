@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             width: 'auto',
             className: 'dt-center editor-edit',
             orderable: false,
-            render: () => '<button class="btn btn-primary edit-btn" data-status="none" id="btnEdit"><i class="fa fa-pencil"></i></button>'
+            render: () => '<button class="btn btn-primary edit-btn" data-status="none" ><i class="fa fa-pencil"></i></button>'
         });
         var table = $("#miTabla").DataTable({
             data: data,
@@ -70,32 +70,57 @@ document.addEventListener('DOMContentLoaded', () => {
                     buttons: [
                         {
                             extend: 'colvisGroup',
-                            text: 'Cloud',
+                            text: '<i class="fa fa-cloud"></i> Cloud',
                             show: colsCloud,
                             hide: colsCyber,
-                            className: 'colvisGroup'
+                            className: 'colvisGroup btn btn-primary'
                         },
                         {
                             extend: 'colvisGroup',
-                            text: 'Cyber',
+                            text: '<i class="fa fa-shield"></i> Cyber',
                             show: colsCyber,
                             hide: colsCloud,
-                            className: 'colvisGroup'
+                            className: 'colvisGroup  btn btn-secondary'
                         },
                         {
                             extend: 'colvisGroup',
-                            text: 'Show all',
+                            text: '<i class="fa fa-bars"></i> Show all',
                             show: ':hidden',
-                            className: 'colvisGroup'
+                            className: 'colvisGroup btn btn-info'
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="fa fa-file-excel-o"></i> Export to Excel',
+                            className: 'btn btn-success',
+                            exportOptions: {
+                                /* columns: ':visible', // Exporta solo las columnas visibles*/
+                                columns: ':not(:first-child)',
+                                format: {
+                                    body: (data, row, column, node) => {
+                                        // Si la columna contiene un checkbox
+                                        if ($(node).find('input[type="checkbox"]').length) {
+                                            // Retorna 1 si está marcado, 0 si no lo está
+                                            return $(node).find('input[type="checkbox"]').is(':checked') ? '1' : '0';
+                                        }
+                                        // Si los datos son una estructura HTML en otras filas no visibles
+                                        if (typeof data === 'string' && data.includes('form-check-input')) {
+                                            const isChecked = $(data).find('input[type="checkbox"]').is(':checked');
+                                            return isChecked ? '1' : '0';
+                                        }
+                                        // Retorna el contenido original para otras columnas
+                                        return data;
+                                    }
+                                }
+                            }
                         }
                     ]
                 }
             }
         });
-        $('#miTabla tbody').on('click', '#btnEdit', function () {
+        $('#miTabla tbody').on('click', '.edit-btn', function () {
             ConfigCheckboxes(this);
         });
-        $('#miTabla').on('change', '#cbService', function () {
+        $('#miTabla').on('change', '.cbService', function () {
             $(this).attr('data-status', "edited");
         });
         $('#miTabla_wrapper').on('click', '.colvisGroup', function (e, button, config) {
@@ -151,9 +176,8 @@ function renderCheckbox(data, key) {
     return `
         <div class="form-check form-switch">
             <input 
-                class="form-check-input" 
+                class="form-check-input cbService" 
                 type="checkbox" 
-                id="cbService" 
                 data-status="none"
                 data-key="${key}"
                 ${data ? 'checked' : ''} 
