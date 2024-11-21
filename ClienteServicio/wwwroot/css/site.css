@@ -1,3 +1,20 @@
+
+@font-face {
+    font-family: "Telefonica Sans", sans-serif;
+    font-family: "Telefonica Sans Hairline", sans-serif;
+    font-family: 'telefonica_sans_hairline';
+    src: url('../woff2/telefonica_sans_hairline.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'telefonica_sans_light';
+    font-family: "Telefonica Sans Light";
+    src: url('../woff2/telefonica_sans_light.woff2') format('woff2');
+}
+@font-face {
+    font-family: "Telefonica Sans Bold";
+    font-family: 'telefonica_sans_bold';
+    src: url('../woff2/telefonica_sans_bold.woff2') format('woff2');
+}
 html {
   font-size: 10px;
 }
@@ -19,4 +36,60 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+.o-header {
+    box-sizing: border-box;
+    background-size: cover;
+    height: 90px;
+    padding: 5px 0;
+    position: relative;
+    background: rgb(242, 244, 255) !important;
+}
+
+.m-navdocuments_item-link {
+    font-family: "Telefonica Sans Light", "Space Grotesk Frontify", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    color: rgba(0, 102, 255, 0.8) !important;
+    font-size: 16px;
+    letter-spacing: normal;
+    line-height: 1.0;
+    font-weight: 400;
+    text-transform: none;
+    font-style: normal;
+    text-decoration: none;
+}
+.o-header__logo {
+    width: 125px;
+    height: auto;
+}
+
+.o-header__logo-wrapper {
+    left: -25px;
+    top: 10px;
+}
+
+.o-title {
+    font-size: 32px !important;
+    text-align: center;
+    font-family: "Telefonica Sans Bold", "Space Grotesk Frontify", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    color: rgb(0, 102, 255);
+    font-size: 16px;
+    line-height: 1.3;
+    font-weight: 400;
+    text-transform: none;
+    font-style: normal;
+    text-decoration: none;
+    margin-top: 0;
+    margin-bottom: 10px;
+    letter-spacing: normal;
+}
+
+.po-brandportal__row-container {
+    box-sizing: border-box;
+    background-color: rgb(242, 244, 255) !important;
+    width: 100%;
+    position: relative;
+    grid-area: 1 / 1;
+    width: auto;
+    height: auto;
+    display: flex;
 }

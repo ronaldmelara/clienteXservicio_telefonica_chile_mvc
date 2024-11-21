@@ -10,10 +10,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<CustomerContext>(op => { op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")); });
 builder.Services.AddDbContext<ServiceContext>(op => { op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")); } );
 builder.Services.AddDbContext<ContractsContext>(op => { op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")); });
+builder.Services.AddDbContext<AreaContext>(op => { op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")); });
 builder.Services.AddScoped<ICustomerRepository, CustormerRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
+builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

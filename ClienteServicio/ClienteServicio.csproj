@@ -11,6 +11,12 @@
   <ItemGroup>
     <Content Remove="wwwroot\lib\datatables\js\dataTables.js" />
     <Content Remove="wwwroot\lib\datatables\js\dataTables.min.js" />
+    <Content Remove="wwwroot\lib\typeahead\bloodhound.js" />
+    <Content Remove="wwwroot\lib\typeahead\bloodhound.min.js" />
+    <Content Remove="wwwroot\lib\typeahead\typeahead.bundle.js" />
+    <Content Remove="wwwroot\lib\typeahead\typeahead.bundle.min.js" />
+    <Content Remove="wwwroot\lib\typeahead\typeahead.jquery.js" />
+    <Content Remove="wwwroot\lib\typeahead\typeahead.jquery.min.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +28,7 @@
     <Content Include="node_modules\%40types\datatables.net\package.json" />
     <Content Include="node_modules\%40types\jquery\package.json" />
     <Content Include="node_modules\%40types\sizzle\package.json" />
+    <Content Include="node_modules\%40types\typeahead\package.json" />
     <Content Include="node_modules\.package-lock.json" />
     <Content Include="node_modules\datatables.net-dt\css\dataTables.dataTables.css" />
     <Content Include="node_modules\datatables.net-dt\css\dataTables.dataTables.min.css" />
@@ -33,6 +40,12 @@
     <Content Include="node_modules\jquery\bower.json" />
     <Content Include="node_modules\jquery\LICENSE.txt" />
     <Content Include="node_modules\jquery\package.json" />
+    <Content Include="node_modules\typeahead.js\bower.json" />
+    <Content Include="node_modules\typeahead.js\composer.json" />
+    <Content Include="node_modules\typeahead.js\package.json" />
+    <Content Include="node_modules\typeahead.js\test\integration\test.html" />
+    <Content Include="node_modules\typeahead.js\test\playground.html" />
+    <Content Include="node_modules\typeahead.js\typeahead.js.jquery.json" />
     <Content Include="node_modules\typescript\lib\cs\diagnosticMessages.generated.json" />
     <Content Include="node_modules\typescript\lib\de\diagnosticMessages.generated.json" />
     <Content Include="node_modules\typescript\lib\es\diagnosticMessages.generated.json" />
@@ -61,6 +74,8 @@
     <None Include="node_modules\%40types\jquery\README.md" />
     <None Include="node_modules\%40types\sizzle\LICENSE" />
     <None Include="node_modules\%40types\sizzle\README.md" />
+    <None Include="node_modules\%40types\typeahead\LICENSE" />
+    <None Include="node_modules\%40types\typeahead\README.md" />
     <None Include="node_modules\.bin\tsc" />
     <None Include="node_modules\.bin\tsc.cmd" />
     <None Include="node_modules\.bin\tsc.ps1" />
@@ -198,6 +213,69 @@
     <None Include="node_modules\jquery\src\var\toString.js" />
     <None Include="node_modules\jquery\src\var\whitespace.js" />
     <None Include="node_modules\jquery\src\wrap.js" />
+    <None Include="node_modules\typeahead.js\.jshintrc" />
+    <None Include="node_modules\typeahead.js\.npmignore" />
+    <None Include="node_modules\typeahead.js\.travis.yml" />
+    <None Include="node_modules\typeahead.js\CHANGELOG.md" />
+    <None Include="node_modules\typeahead.js\CONTRIBUTING.md" />
+    <None Include="node_modules\typeahead.js\dist\bloodhound.js" />
+    <None Include="node_modules\typeahead.js\dist\bloodhound.min.js" />
+    <None Include="node_modules\typeahead.js\dist\typeahead.bundle.js" />
+    <None Include="node_modules\typeahead.js\dist\typeahead.bundle.min.js" />
+    <None Include="node_modules\typeahead.js\dist\typeahead.jquery.js" />
+    <None Include="node_modules\typeahead.js\dist\typeahead.jquery.min.js" />
+    <None Include="node_modules\typeahead.js\doc\bloodhound.md" />
+    <None Include="node_modules\typeahead.js\doc\jquery_typeahead.md" />
+    <None Include="node_modules\typeahead.js\doc\migration\0.10.0.md" />
+    <None Include="node_modules\typeahead.js\Gruntfile.js" />
+    <None Include="node_modules\typeahead.js\karma.conf.js" />
+    <None Include="node_modules\typeahead.js\LICENSE" />
+    <None Include="node_modules\typeahead.js\README.md" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\bloodhound.js" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\lru_cache.js" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\options_parser.js" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\persistent_storage.js" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\prefetch.js" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\remote.js" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\search_index.js" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\tokenizers.js" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\transport.js" />
+    <None Include="node_modules\typeahead.js\src\bloodhound\version.js" />
+    <None Include="node_modules\typeahead.js\src\common\utils.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\dataset.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\default_menu.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\event_bus.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\event_emitter.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\highlight.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\input.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\menu.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\plugin.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\typeahead.js" />
+    <None Include="node_modules\typeahead.js\src\typeahead\www.js" />
+    <None Include="node_modules\typeahead.js\test\bloodhound\bloodhound_spec.js" />
+    <None Include="node_modules\typeahead.js\test\bloodhound\lru_cache_spec.js" />
+    <None Include="node_modules\typeahead.js\test\bloodhound\options_parser_spec.js" />
+    <None Include="node_modules\typeahead.js\test\bloodhound\persistent_storage_spec.js" />
+    <None Include="node_modules\typeahead.js\test\bloodhound\prefetch_spec.js" />
+    <None Include="node_modules\typeahead.js\test\bloodhound\remote_spec.js" />
+    <None Include="node_modules\typeahead.js\test\bloodhound\search_index_spec.js" />
+    <None Include="node_modules\typeahead.js\test\bloodhound\tokenizers_spec.js" />
+    <None Include="node_modules\typeahead.js\test\bloodhound\transport_spec.js" />
+    <None Include="node_modules\typeahead.js\test\ci" />
+    <None Include="node_modules\typeahead.js\test\fixtures\ajax_responses.js" />
+    <None Include="node_modules\typeahead.js\test\fixtures\data.js" />
+    <None Include="node_modules\typeahead.js\test\fixtures\html.js" />
+    <None Include="node_modules\typeahead.js\test\helpers\typeahead_mocks.js" />
+    <None Include="node_modules\typeahead.js\test\integration\test.js" />
+    <None Include="node_modules\typeahead.js\test\typeahead\dataset_spec.js" />
+    <None Include="node_modules\typeahead.js\test\typeahead\default_results_spec.js" />
+    <None Include="node_modules\typeahead.js\test\typeahead\event_bus_spec.js" />
+    <None Include="node_modules\typeahead.js\test\typeahead\event_emitter_spec.js" />
+    <None Include="node_modules\typeahead.js\test\typeahead\highlight_spec.js" />
+    <None Include="node_modules\typeahead.js\test\typeahead\input_spec.js" />
+    <None Include="node_modules\typeahead.js\test\typeahead\plugin_spec.js" />
+    <None Include="node_modules\typeahead.js\test\typeahead\results_spec.js" />
+    <None Include="node_modules\typeahead.js\test\typeahead\typeahead_spec.js" />
     <None Include="node_modules\typescript\bin\tsc" />
     <None Include="node_modules\typescript\bin\tsserver" />
     <None Include="node_modules\typescript\lib\cancellationToken.js" />
@@ -211,6 +289,12 @@
     <None Include="node_modules\typescript\SECURITY.md" />
     <None Include="wwwroot\lib\datatables\js\dataTables.js" />
     <None Include="wwwroot\lib\datatables\js\dataTables.min.js" />
+    <None Include="wwwroot\lib\typeahead\bloodhound.js" />
+    <None Include="wwwroot\lib\typeahead\bloodhound.min.js" />
+    <None Include="wwwroot\lib\typeahead\typeahead.bundle.js" />
+    <None Include="wwwroot\lib\typeahead\typeahead.bundle.min.js" />
+    <None Include="wwwroot\lib\typeahead\typeahead.jquery.js" />
+    <None Include="wwwroot\lib\typeahead\typeahead.jquery.min.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -218,6 +302,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
@@ -229,6 +314,7 @@
     <TypeScriptCompile Include="node_modules\%40types\jquery\legacy.d.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\misc.d.ts" />
     <TypeScriptCompile Include="node_modules\%40types\sizzle\index.d.ts" />
+    <TypeScriptCompile Include="node_modules\%40types\typeahead\index.d.ts" />
     <TypeScriptCompile Include="node_modules\datatables.net-dt\types\dataTables.dataTables.d.ts" />
     <TypeScriptCompile Include="node_modules\datatables.net\types\types.d.ts" />
     <TypeScriptCompile Include="node_modules\typescript\lib\lib.d.ts" />

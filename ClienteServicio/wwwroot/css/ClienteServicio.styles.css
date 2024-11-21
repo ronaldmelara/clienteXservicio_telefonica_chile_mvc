@@ -117,4 +117,32 @@ table {
     background-color: #fff !important; /* El círculo dentro del switch será blanco cuando NO está marcado */
 }
 
+.twitter-typeahead{
+    display:unset !important;
+}
 
+.tt-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    z-index: 99999999;
+    background-color: rgb(242, 244, 255);
+    width: 100%;
+    left: unset !important;
+}
+
+.tt-suggestion {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+    .tt-suggestion:last-child {
+        border-bottom: none;
+    }
+
+
+    .tt-hint{
+        top:unset !important;
+        z-index:-1000;
+        display:none;
+    }
