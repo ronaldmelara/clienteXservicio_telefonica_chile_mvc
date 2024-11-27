@@ -26,7 +26,6 @@ let ListServices: Service[] = [];
 let colsCloud: number[] = [];
 let colsCyber: number[] = [];
 
-
 function getIndexColumns() {
     const a = ListServices.filter(srv => srv.idarea === enumArea.Cloud);
     const b = ListServices.filter(srv => srv.idarea === enumArea.Cyber);

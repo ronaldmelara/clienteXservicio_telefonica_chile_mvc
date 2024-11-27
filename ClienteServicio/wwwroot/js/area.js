@@ -21,7 +21,6 @@ let selectedSuggestion = {
 document.addEventListener('DOMContentLoaded', () => {
     obtenerAreas().then(data => {
         initializeAreaDropdown(data);
-        console.log(data);
         var table = $("#tblAreaServicios").DataTable({
             data: data,
             columns: [
@@ -44,10 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
             rowGroup: {
                 dataSrc: 'area' // Agrupa por el campo "areaName"
             },
-            scrollX: true, // Permite el desplazamiento horizontal
-            /* scrollY: '400px',*/ // Ajusta la altura de la tabla si es necesario
-            scrollCollapse: true,
-            responsive: true, // Asegura que la tabla se vea bien en dispositivos m�viles
+            paging: false, // Desactiva la paginaci�n
+            searching: false, // Desactiva la barra de b�squeda
         });
         loadTypeahead();
         loadButtons();
