@@ -2,52 +2,64 @@
     ViewData["Title"] = "Mantenedor Servicios";
 }
 
-<h4 class="display-4 o-title"><strong>Mantenedor Servicios</strong></h4>
+<h4 class="display-4 o-title"><strong>Servicios</strong></h4>
 
 
 <script src="~/js/area.js" asp-append-version="true"></script> <!-- Incluir el archivo JS compilado -->
 
 
-<div class="card text-center">
-  <div class="card-header">
-    Servicios
-  </div>
-  <div class="card-body">
-    <form class="row g-3 p-3">
 
 
-    <div class="col-md-6">
-        <label for="areaDropdown" class="form-label">Seleccionar Área:</label>
-        <select id="areaDropdown" class="form-select">
-        <!-- Las áreas se llenarán dinámicamente -->
-        </select>
-    </div>
-    <div class="col-md-6" id="the-basics">
-        <label for="serviceInput" class="form-label">Nombre del servicio:</label>
-        <input id="serviceInput" class="form-control typeahead" type="text" placeholder="Escribe un nombre...">
+<div class="row">
+    <div class="d-flex justify-content-start">
+        <button type="button" class="btn btn-primary" id="btnEditService">Editar/Nuevo Servicio</button>
     </div>
 
-     <div class="col-12">
-          <button id="btnSave" class="btn btn-success" disabled>Agregar</button>
-        <button id="btnDisable" class="btn btn-danger" disabled>Desactivar</button>
-         </div>
-</form>
+</div>
 
-
-  </div>
-  <div class="card-footer text-muted">&nbsp;
-   <span class="badge bg-warning text-dark" style="display:none;" id="bg-warn">&nbsp;</span>
-  </div>
+<div class="row">
+    <div class="col-md-12"> 
+        <!-- En tu vista (ej. Index.cshtml) -->
+        <table id="tblAreaServicios" class="table table-striped" style="width:100%">
+        </table>
+    </div>
 </div>
 
 
+<!-- Modal -->
+<div class="modal fade" id="mdEditServicio" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Editar/Nuevo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <div class="col-md-12">
+                        <label for="areaDropdown" class="form-label">Seleccionar Área:</label>
+                        <select id="areaDropdown" class="form-select">
+                            <!-- Las áreas se llenarán dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="col-md-12" id="the-basics">
+                        <label for="serviceInput" class="form-label">Nombre del servicio:</label>
+                        <input id="serviceInput" class="form-control typeahead" type="text" placeholder="Escribe un nombre...">
+                    </div>
 
 
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="badge bg-warning text-dark" style="display:none;" id="bg-warn">&nbsp;</span>
+                <br />
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                <button id="btnSave" class="btn btn-success" disabled>Agregar</button>
+                <button id="btnDisable" class="btn btn-danger" disabled>Desactivar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-
-
-<!-- En tu vista (ej. Index.cshtml) -->
-<table id="tblAreaServicios" class="table table-striped" style="width:100%">
-
-</table>

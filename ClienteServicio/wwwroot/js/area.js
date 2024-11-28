@@ -13,7 +13,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 let selectedAreaId = null;
 let isSuggestionSelected = false; // Variable para controlar si se seleccion� una sugerencia
 let selectedSuggestion = {
-    idservice: 0, // Valor predeterminado
+    idservice: 0,
     service: "",
     idarea: 0,
     enable: 0,
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rowGroup: {
                 dataSrc: 'area' // Agrupa por el campo "areaName"
             },
-            paging: false, // Desactiva la paginaci�n
+            paging: false,
             searching: false, // Desactiva la barra de b�squeda
         });
         loadTypeahead();
@@ -259,7 +259,8 @@ function loadButtons() {
         myBtnEnable.addEventListener('click', () => {
             const valEnable = $(myBtnEnable).attr('data-enable') || '';
             updateServiceEnableStatus(selectedSuggestion.idservice, (valEnable === '1' ? false : true)).then(() => {
-                console.log("actualizado");
+                hidePopupService();
+                reloadServiceTable();
             });
         });
     }
@@ -267,9 +268,41 @@ function loadButtons() {
         myBtnNew.addEventListener('click', () => {
             addService(selectedSuggestion).then(newId => {
                 console.log(`El ID del nuevo servicio es: ${newId}`);
+                hidePopupService();
+                reloadServiceTable();
             }).catch(error => {
                 console.error('Error al agregar el servicio:', error);
             });
         });
     }
+    const myBtnEditService = document.getElementById('btnEditService');
+    if (myBtnEditService) {
+        myBtnEditService.addEventListener('click', () => {
+            const modal = document.getElementById('mdEditServicio');
+            const myModal = new bootstrap.Modal(modal);
+            myModal.show();
+        });
+    }
+}
+function hidePopupService() {
+    // Selecciona el modal por su ID
+    const modalElement = document.getElementById('mdEditServicio');
+    // Inicializa el modal si no est� inicializado
+    if (modalElement) {
+        const myModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+        // Llama a hide() para cerrarlo
+        myModal.hide();
+    }
+    else {
+        console.error('Modal element not found');
+    }
+}
+function reloadServiceTable() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const updatedData = yield obtenerAreas(); // Llama a la funci�n para obtener los datos actualizados
+        const table = $('#tblAreaServicios').DataTable();
+        table.clear(); // Limpia los datos actuales de la tabla
+        table.rows.add(updatedData); // Agrega las nuevas filas
+        table.draw(); // Redibuja la tabla
+    });
 }

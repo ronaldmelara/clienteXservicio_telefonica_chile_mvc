@@ -9,7 +9,45 @@
 
 <script src="~/js/customer.js" asp-append-version="true"></script> <!-- Incluir el archivo JS compilado -->
 
-<!-- En tu vista (ej. Index.cshtml) -->
-<table id="tblClientes" class="table table-striped" style="width:100%">
+<div>
 
-</table>
+    <div class="row">
+        <div class="d-flex justify-content-start">
+            <button type="button" class="btn btn-primary" id="btnNew">Crear Nuevo Cliente</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 ">
+            <!-- En tu vista (ej. Index.cshtml) -->
+            <table id="tblClientes" class="table table-striped" style="width:100%">
+            </table>
+        </div>
+       
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Nuevo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Cliente</label>
+                        <input class="form-control" type="text" placeholder="Nombre del Cliente" id="txtCliente" aria-label="Nombre del Cliente">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveCustomer">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>

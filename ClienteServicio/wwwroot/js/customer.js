@@ -17,10 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     data: null,
                     title: "",
                     orderable: false,
-                    width: '30px',
+                    width: '69px',
                     render: function () {
                         // Bot�n para activar edici�n
-                        return `<button class="btn btn-primary btn-sm edit-button"><i class="fa fa-pencil"></i></button>`;
+                        return `<button class="btn btn-primary btn-sm edit-button"><i class="fa fa-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm del-button"><i class="fa fa-trash"></i></button>`;
                     },
                 },
                 {
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                 }
             ],
-            scrollX: true, // Permite el desplazamiento horizontal
+            scrollX: true,
             /* scrollY: '400px',*/ // Ajusta la altura de la tabla si es necesario
             scrollCollapse: true,
             responsive: true, // Asegura que la tabla se vea bien en dispositivos m�viles
@@ -93,6 +94,52 @@ function loadTableEvents(table) {
             alert("Error al guardar los cambios.");
         });
     });
+    const myBtnNew = document.getElementById('btnNew');
+    if (myBtnNew) {
+        myBtnNew.addEventListener('click', () => {
+            const modal = document.getElementById('exampleModal');
+            const myModal = new bootstrap.Modal(modal);
+            myModal.show();
+        });
+    }
+    const myBtnSaveNewCustomer = document.getElementById('btnSaveCustomer');
+    if (myBtnSaveNewCustomer) {
+        myBtnSaveNewCustomer.addEventListener('click', () => {
+            guardarNuevoCliente().then(newId => {
+                console.log(`El ID del nuevo cliente es: ${newId}`);
+                reloadCustomerTable();
+            });
+            //addService(selectedSuggestion).then(newId => {
+            //    console.log(`El ID del nuevo servicio es: ${newId}`);
+            //}).catch(error => {
+            //    console.error('Error al agregar el servicio:', error);
+            //});
+        });
+    }
+    $("#tblClientes").on("click", ".del-button", function () {
+        const row = $(this).closest("tr");
+        const data = table.row(row).data();
+        // Obtener el nuevo valor del input
+        // Guardar los cambios en el servidor (ejemplo usando fetch)
+        fetch(`/api/v1/customer/${data.idcustomer}/down`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+            .then((response) => {
+            if (!response.ok)
+                throw new Error("Error al eliminar");
+            return response.json();
+        })
+            .then(() => {
+            reloadCustomerTable();
+        })
+            .catch((error) => {
+            console.error(error);
+            alert("Error al eliminar los cambios.");
+        });
+    });
 }
 function obtenerClientes() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -114,5 +161,51 @@ function obtenerClientes() {
             console.error('Error al llamar la API:', error);
             return [];
         }
+    });
+}
+function guardarNuevoCliente() {
+    var _a, _b;
+    return __awaiter(this, void 0, void 0, function* () {
+        // Obtener el nuevo valor del input
+        const newValue = document.getElementById('txtCliente');
+        // row.find(".edit-input").val()?.toString().trim()
+        // Guardar los cambios en el servidor (ejemplo usando fetch)
+        let defaultCust = { idcustomer: 0, customer: "" };
+        defaultCust.customer = (_b = (_a = $(newValue).val()) === null || _a === void 0 ? void 0 : _a.toString().trim()) !== null && _b !== void 0 ? _b : "";
+        fetch(`/api/v1/customer/add`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(defaultCust),
+        })
+            .then((response) => {
+            if (!response.ok)
+                throw new Error("Error al guardar");
+            return response.json();
+        })
+            .then((data) => {
+            return data;
+            // Actualizar el valor en la tabla
+            //data.customer = newValue;
+            //table.row(row).data(data).invalidate();
+            //// Cambiar el bot�n de nuevo a "Editar"
+            //$(this).removeClass("save-button btn-success").addClass("edit-button btn-primary");
+            //$(this).find('i').removeClass("fa-save").addClass('fa-pencil');
+        })
+            .catch((error) => {
+            console.error(error);
+            alert("Error al guardar los cambios.");
+        });
+        return defaultCust;
+    });
+}
+function reloadCustomerTable() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const updatedData = yield obtenerAreas(); // Llama a la funci�n para obtener los datos actualizados
+        const table = $('#tblClientes').DataTable();
+        table.clear(); // Limpia los datos actuales de la tabla
+        table.rows.add(updatedData); // Agrega las nuevas filas
+        table.draw(); // Redibuja la tabla
     });
 }

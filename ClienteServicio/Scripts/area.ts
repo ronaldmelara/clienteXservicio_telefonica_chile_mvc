@@ -296,7 +296,8 @@ function loadButtons(): void {
         myBtnEnable.addEventListener('click', () => {
             const valEnable = $(myBtnEnable).attr('data-enable') || '';
             updateServiceEnableStatus(selectedSuggestion.idservice, (valEnable === '1' ? false : true)).then(() => {
-                console.log("actualizado");
+                hidePopupService();
+                reloadServiceTable();
             });
         });
     }
@@ -305,10 +306,49 @@ function loadButtons(): void {
         myBtnNew.addEventListener('click', () => {
             addService(selectedSuggestion).then(newId => {
                 console.log(`El ID del nuevo servicio es: ${newId}`);
+                hidePopupService();
+                reloadServiceTable();
             }).catch(error => {
                 console.error('Error al agregar el servicio:', error);
             });
         });
     }
 
+    const myBtnEditService = document.getElementById('btnEditService') as HTMLButtonElement;
+
+
+    if (myBtnEditService) {
+        myBtnEditService.addEventListener('click', () => {
+
+            const modal = document.getElementById('mdEditServicio') as HTMLElement;
+            const myModal = new bootstrap.Modal(modal);
+            myModal.show();
+        });
+    }
+
 }
+
+function hidePopupService(): void {
+    // Selecciona el modal por su ID
+    const modalElement = document.getElementById('mdEditServicio') as HTMLElement;
+
+    // Inicializa el modal si no está inicializado
+    if (modalElement) {
+        const myModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+
+        // Llama a hide() para cerrarlo
+        myModal.hide();
+    } else {
+        console.error('Modal element not found');
+    }
+
+}
+
+async function reloadServiceTable(): Promise<void> {
+    const updatedData = await obtenerAreas(); // Llama a la función para obtener los datos actualizados
+    const table = $('#tblAreaServicios').DataTable();
+    table.clear(); // Limpia los datos actuales de la tabla
+    table.rows.add(updatedData); // Agrega las nuevas filas
+    table.draw(); // Redibuja la tabla
+}
+

@@ -67,5 +67,20 @@ namespace ClienteServicio.Controllers
                 return StatusCode(500, $"Error al agregar el cliente: {ex.Message}");
             }
         }
+
+
+        [HttpDelete("{id}/down")]
+        public IActionResult Remove(int id)
+        {
+            var cust = _customerRepository.GetCustomerById(id);
+            if (cust == null)
+            {
+                return NotFound(new { message = "Customer not found." });
+            }
+
+            _customerRepository.Delete(cust);
+            
+            return Ok(new { message = "Customer removed successfully." });
+        }
     }
 }
