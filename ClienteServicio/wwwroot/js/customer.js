@@ -1,15 +1,8 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+/// <reference path="./interfaces.ts" />     
 document.addEventListener('DOMContentLoaded', () => {
     obtenerClientes().then(data => {
+        console.log(data);
         var table = $("#tblClientes").DataTable({
             data: data,
             columns: [
@@ -25,20 +18,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                 },
                 {
-                    data: 'idcustomer',
-                    title: 'id',
-                    width: '70px'
+                    data: 'rut',
+                    title: 'rut',
+                    visible: false,
+                },
+                {
+                    data: 'rutdv',
+                    title: 'RUT',
+                    width: '100px',
+                    className: "text-center-datatable"
                 },
                 {
                     data: 'customer',
                     title: 'Cliente',
+                    className: "text-center-datatable",
                     render: function (data) {
                         // Renderiza el texto del cliente como texto editable
                         return `<span class="editable-cell">${data}</span>`;
                     },
                 }
             ],
-            scrollX: true,
+            scrollX: true, // Permite el desplazamiento horizontal
             /* scrollY: '400px',*/ // Ajusta la altura de la tabla si es necesario
             scrollCollapse: true,
             responsive: true, // Asegura que la tabla se vea bien en dispositivos m�viles
@@ -60,19 +60,19 @@ function loadTableEvents(table) {
     });
     // Manejar evento de clic en el bot�n de guardar
     $("#tblClientes").on("click", ".save-button", function () {
-        var _a;
         const row = $(this).closest("tr");
         const data = table.row(row).data();
         // Obtener el nuevo valor del input
-        const newValue = ((_a = row.find(".edit-input").val()) === null || _a === void 0 ? void 0 : _a.toString().trim()) || data.customer;
+        const newValue = row.find(".edit-input").val()?.toString().trim() || data.customer;
         // Guardar los cambios en el servidor (ejemplo usando fetch)
-        fetch(`/api/v1/customer/${data.idcustomer}/name`, {
+        fetch(`/api/v1/customer/${data.rut}/name`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                idcustomer: data.idcustomer,
+                rut: data.rut,
+                dv: data.dv,
                 customer: newValue,
             }),
         })
@@ -121,7 +121,7 @@ function loadTableEvents(table) {
         const data = table.row(row).data();
         // Obtener el nuevo valor del input
         // Guardar los cambios en el servidor (ejemplo usando fetch)
-        fetch(`/api/v1/customer/${data.idcustomer}/down`, {
+        fetch(`/api/v1/customer/${data.rut}/down`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -141,71 +141,66 @@ function loadTableEvents(table) {
         });
     });
 }
-function obtenerClientes() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch('/api/v1/customer/all'); // Hacemos la solicitud GET
-            if (!response.ok) {
-                throw new Error('Error en la solicitud');
-            }
-            const data = yield response.json(); // Convertimos la respuesta a JSON
-            if (!Array.isArray(data)) {
-                throw new Error("Respuesta inesperada de la API");
-            }
-            return data.map(item => ({
-                customer: item.customer,
-                idcustomer: item.idcustomer,
-            })); // Devolvemos los datos
+async function obtenerClientes() {
+    try {
+        const response = await fetch('/api/v1/customer/all'); // Hacemos la solicitud GET
+        if (!response.ok) {
+            throw new Error('Error en la solicitud');
         }
-        catch (error) {
-            console.error('Error al llamar la API:', error);
-            return [];
+        const data = await response.json(); // Convertimos la respuesta a JSON
+        if (!Array.isArray(data)) {
+            throw new Error("Respuesta inesperada de la API");
         }
-    });
+        return data.map(item => ({
+            customer: item.customer,
+            rut: item.rut,
+            dv: item.dv,
+            rutdv: item.rutdv
+        })); // Devolvemos los datos
+    }
+    catch (error) {
+        console.error('Error al llamar la API:', error);
+        return [];
+    }
 }
-function guardarNuevoCliente() {
-    var _a, _b;
-    return __awaiter(this, void 0, void 0, function* () {
-        // Obtener el nuevo valor del input
-        const newValue = document.getElementById('txtCliente');
-        // row.find(".edit-input").val()?.toString().trim()
-        // Guardar los cambios en el servidor (ejemplo usando fetch)
-        let defaultCust = { idcustomer: 0, customer: "" };
-        defaultCust.customer = (_b = (_a = $(newValue).val()) === null || _a === void 0 ? void 0 : _a.toString().trim()) !== null && _b !== void 0 ? _b : "";
-        fetch(`/api/v1/customer/add`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(defaultCust),
-        })
-            .then((response) => {
-            if (!response.ok)
-                throw new Error("Error al guardar");
-            return response.json();
-        })
-            .then((data) => {
-            return data;
-            // Actualizar el valor en la tabla
-            //data.customer = newValue;
-            //table.row(row).data(data).invalidate();
-            //// Cambiar el bot�n de nuevo a "Editar"
-            //$(this).removeClass("save-button btn-success").addClass("edit-button btn-primary");
-            //$(this).find('i').removeClass("fa-save").addClass('fa-pencil');
-        })
-            .catch((error) => {
-            console.error(error);
-            alert("Error al guardar los cambios.");
-        });
-        return defaultCust;
+async function guardarNuevoCliente() {
+    // Obtener el nuevo valor del input
+    const newValue = document.getElementById('txtCliente');
+    // row.find(".edit-input").val()?.toString().trim()
+    // Guardar los cambios en el servidor (ejemplo usando fetch)
+    let defaultCust = { rut: 0, dv: "", customer: "", rutdv: '' };
+    defaultCust.customer = $(newValue).val()?.toString().trim() ?? "";
+    fetch(`/api/v1/customer/add`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(defaultCust),
+    })
+        .then((response) => {
+        if (!response.ok)
+            throw new Error("Error al guardar");
+        return response.json();
+    })
+        .then((data) => {
+        return data;
+        // Actualizar el valor en la tabla
+        //data.customer = newValue;
+        //table.row(row).data(data).invalidate();
+        //// Cambiar el bot�n de nuevo a "Editar"
+        //$(this).removeClass("save-button btn-success").addClass("edit-button btn-primary");
+        //$(this).find('i').removeClass("fa-save").addClass('fa-pencil');
+    })
+        .catch((error) => {
+        console.error(error);
+        alert("Error al guardar los cambios.");
     });
+    return defaultCust;
 }
-function reloadCustomerTable() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const updatedData = yield obtenerAreas(); // Llama a la funci�n para obtener los datos actualizados
-        const table = $('#tblClientes').DataTable();
-        table.clear(); // Limpia los datos actuales de la tabla
-        table.rows.add(updatedData); // Agrega las nuevas filas
-        table.draw(); // Redibuja la tabla
-    });
+async function reloadCustomerTable() {
+    const updatedData = await obtenerClientes(); // Llama a la funci�n para obtener los datos actualizados
+    const table = $('#tblClientes').DataTable();
+    table.clear(); // Limpia los datos actuales de la tabla
+    table.rows.add(updatedData); // Agrega las nuevas filas
+    table.draw(); // Redibuja la tabla
 }

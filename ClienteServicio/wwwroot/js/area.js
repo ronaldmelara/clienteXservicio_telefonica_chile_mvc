@@ -1,14 +1,5 @@
 "use strict";
-//import Bloodhound from "typeahead.js";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+/// <reference path="./interfaces.ts" />     
 // Variables para almacenar el �rea seleccionada y los servicios cargados
 let selectedAreaId = null;
 let isSuggestionSelected = false; // Variable para controlar si se seleccion� una sugerencia
@@ -50,28 +41,26 @@ document.addEventListener('DOMContentLoaded', () => {
         loadButtons();
     });
 });
-function obtenerAreas() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch('/Area/GetAllAreas'); // Hacemos la solicitud GET
-            if (!response.ok) {
-                throw new Error('Error en la solicitud');
-            }
-            const data = yield response.json(); // Convertimos la respuesta a JSON
-            if (!Array.isArray(data)) {
-                throw new Error("Respuesta inesperada de la API");
-            }
-            return data.map(item => ({
-                area: item.area,
-                Services: item.services,
-                idarea: item.idarea,
-            })); // Devolvemos los datos
+async function obtenerAreas() {
+    try {
+        const response = await fetch('/Area/GetAllAreas'); // Hacemos la solicitud GET
+        if (!response.ok) {
+            throw new Error('Error en la solicitud');
         }
-        catch (error) {
-            console.error('Error al llamar la API:', error);
-            return [];
+        const data = await response.json(); // Convertimos la respuesta a JSON
+        if (!Array.isArray(data)) {
+            throw new Error("Respuesta inesperada de la API");
         }
-    });
+        return data.map(item => ({
+            area: item.area,
+            Services: item.services,
+            idarea: item.idarea,
+        })); // Devolvemos los datos
+    }
+    catch (error) {
+        console.error('Error al llamar la API:', error);
+        return [];
+    }
 }
 // Inicializar el dropdown de �reas
 function initializeAreaDropdown(areas) {
@@ -109,7 +98,7 @@ function loadTypeahead() {
                     throw new Error("La URL no est� definida en los settings.");
                 }
                 // Reemplaza %AREAID con el �rea seleccionada.
-                settings.url = settings.url.replace("%AREAID", selectedAreaId === null || selectedAreaId === void 0 ? void 0 : selectedAreaId.toString());
+                settings.url = settings.url.replace("%AREAID", selectedAreaId?.toString());
                 settings.url = settings.url.replace("%QUERY", encodeURIComponent(query));
                 return settings;
             },
@@ -156,8 +145,7 @@ function loadTypeahead() {
         console.log("Autocompletado:", suggestion);
     })
         .on("typeahead:close", function () {
-        var _a;
-        const inputValue = (_a = $(this).val()) === null || _a === void 0 ? void 0 : _a.toString().trim();
+        const inputValue = $(this).val()?.toString().trim();
         if (isSuggestionSelected) {
             // Se seleccion� un elemento: no hacer nada
             $("#bg-warn").hide();
@@ -205,52 +193,48 @@ function loadTypeahead() {
     });
 }
 // Funci�n para actualizar el estado de 'enable'
-function updateServiceEnableStatus(serviceId, isEnabled) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch(`/api/v1/services/${serviceId}/enable`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(isEnabled),
-            });
-            if (!response.ok) {
-                const error = yield response.json();
-                console.error("Error al actualizar el estado:", error.message);
-                return;
-            }
-            const result = yield response.json();
-            console.log("Estado actualizado:", result.message);
+async function updateServiceEnableStatus(serviceId, isEnabled) {
+    try {
+        const response = await fetch(`/api/v1/services/${serviceId}/enable`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(isEnabled),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            console.error("Error al actualizar el estado:", error.message);
+            return;
         }
-        catch (error) {
-            console.error("Error en la solicitud:", error);
-        }
-    });
+        const result = await response.json();
+        console.log("Estado actualizado:", result.message);
+    }
+    catch (error) {
+        console.error("Error en la solicitud:", error);
+    }
 }
-function addService(newService) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch('/api/v1/services/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newService),
-            });
-            if (!response.ok) {
-                const error = yield response.text();
-                throw new Error(`Error al crear el servicio: ${error}`);
-            }
-            const result = yield response.json();
-            console.log('Servicio creado exitosamente:', result);
-            return result.id; // Devuelve el ID del nuevo servicio
+async function addService(newService) {
+    try {
+        const response = await fetch('/api/v1/services/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newService),
+        });
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Error al crear el servicio: ${error}`);
         }
-        catch (error) {
-            console.error('Error:', error);
-            throw error; // Propaga el error para manejarlo externamente
-        }
-    });
+        const result = await response.json();
+        console.log('Servicio creado exitosamente:', result);
+        return result.id; // Devuelve el ID del nuevo servicio
+    }
+    catch (error) {
+        console.error('Error:', error);
+        throw error; // Propaga el error para manejarlo externamente
+    }
 }
 function loadButtons() {
     const myBtnEnable = document.getElementById('btnDisable');
@@ -297,12 +281,10 @@ function hidePopupService() {
         console.error('Modal element not found');
     }
 }
-function reloadServiceTable() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const updatedData = yield obtenerAreas(); // Llama a la funci�n para obtener los datos actualizados
-        const table = $('#tblAreaServicios').DataTable();
-        table.clear(); // Limpia los datos actuales de la tabla
-        table.rows.add(updatedData); // Agrega las nuevas filas
-        table.draw(); // Redibuja la tabla
-    });
+async function reloadServiceTable() {
+    const updatedData = await obtenerAreas(); // Llama a la funci�n para obtener los datos actualizados
+    const table = $('#tblAreaServicios').DataTable();
+    table.clear(); // Limpia los datos actuales de la tabla
+    table.rows.add(updatedData); // Agrega las nuevas filas
+    table.draw(); // Redibuja la tabla
 }

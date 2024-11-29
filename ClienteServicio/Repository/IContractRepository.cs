@@ -6,7 +6,7 @@ namespace ClienteServicio.Repository
     {
         List<Dictionary<string, object>> GetAllContracts();
 
-        Contract GetContract(int serviceId, int customerId);
+        Contract GetContract(int serviceId, int rut);
 
         void UpdateContract(Contract updatedContract);
     }

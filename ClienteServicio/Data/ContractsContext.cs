@@ -1,4 +1,5 @@
-﻿using ClienteServicio.Models;
+﻿using ClienteServicio.helpers;
+using ClienteServicio.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -30,7 +31,7 @@ namespace ClienteServicio.Data
                         var row = new Dictionary<string, object>();
                         for (var i = 0; i < reader.FieldCount; i++)
                         {
-                            if(i >= 2)
+                            if(i >= 4)
                             {
                                 if(reader.GetValue(i) == DBNull.Value)
                                 {
@@ -42,7 +43,7 @@ namespace ClienteServicio.Data
                                 }
                             }else
                             {
-                                row[reader.GetName(i)] = reader.GetValue(i);
+                                row[reader.GetName(i).ToString().UpperFirstChar()] = reader.GetValue(i);
                             }
                            
                         }

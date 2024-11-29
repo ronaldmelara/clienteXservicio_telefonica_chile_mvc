@@ -30,13 +30,14 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark m-navdocuments_item-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark m-navdocuments_item-link" asp-area="" asp-controller="View" asp-action="Home">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark m-navdocuments_item-link" asp-area="" asp-controller="Cliente" asp-action="Index">Clientes</a>
+                            <a class="nav-link text-dark m-navdocuments_item-link" asp-area="" asp-controller="View" asp-action="Customer">Clientes</a>
                         </li>
+   
                         <li class="nav-item">
-                            <a class="nav-link text-dark m-navdocuments_item-link" asp-area="" asp-controller="Servicio" asp-action="Index">Servicios</a>
+                            <a class="nav-link text-dark m-navdocuments_item-link" asp-area="" asp-controller="View" asp-action="Service">Servicios</a>
                         </li>
                     </ul>
                 </div>
@@ -71,7 +72,7 @@
     <script src="~/lib/datatables/js/buttons.html5.min.js"></script>
     <script src="~/lib/datatables/js/buttons.print.min.js"></script>
     <script src="~/lib/typeahead/typeahead.bundle.js"></script>
-    <script src="~/js/app.js" asp-append-version="true"></script> <!-- Incluir el archivo JS compilado -->
+  
     
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -1,16 +1,6 @@
-//import Bloodhound from "typeahead.js";
 
-interface Service {
-    idservice: number,
-    service: string,
-    idarea: number,
-    enable: number
-}
-interface Area {
-    Services: Service[],
-    area: string,
-    idarea: number
-}
+
+/// <reference path="./interfaces.ts" />     
 
 // Variables para almacenar el área seleccionada y los servicios cargados
 let selectedAreaId: number | null = null;

@@ -31,10 +31,10 @@ namespace ClienteServicio.Controllers
             return Ok(data);
         }
 
-        [HttpPut("{id}/name")]
-        public IActionResult UpdateName(int id, [FromBody] Customer newCustomer)
+        [HttpPut("{rut}/name")]
+        public IActionResult UpdateName(int rut, [FromBody] Customer newCustomer)
         {
-            var customer = _customerRepository.GetCustomerById(id);
+            var customer = _customerRepository.GetCustomerByRut(rut);
             if (customer == null)
             {
                 return NotFound(new { message = "Customer not found." });
@@ -59,7 +59,7 @@ namespace ClienteServicio.Controllers
             try
             {
                 _customerRepository.Add(newCustomer);
-                return CreatedAtAction(nameof(AddCustomer), new { id = newCustomer.idcustomer }, newCustomer);
+                return CreatedAtAction(nameof(AddCustomer), new { id = newCustomer.rut }, newCustomer);
             }
             catch (Exception ex)
             {
@@ -72,7 +72,7 @@ namespace ClienteServicio.Controllers
         [HttpDelete("{id}/down")]
         public IActionResult Remove(int id)
         {
-            var cust = _customerRepository.GetCustomerById(id);
+            var cust = _customerRepository.GetCustomerByRut(id);
             if (cust == null)
             {
                 return NotFound(new { message = "Customer not found." });

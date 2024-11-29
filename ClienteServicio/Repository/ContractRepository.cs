@@ -17,9 +17,9 @@ namespace ClienteServicio.Repository
             return _customerContext.GetContracts();
         }
 
-        public Contract GetContract(int serviceId, int customerId)
+        public Contract GetContract(int serviceId, int rut)
         {
-            return _customerContext.Contracts.FirstOrDefault(c => c.idcustomer == customerId && c.idservice == serviceId);
+            return _customerContext.Contracts.FirstOrDefault(c => c.rut == rut && c.idservice == serviceId);
         }
 
 
@@ -31,7 +31,7 @@ namespace ClienteServicio.Repository
             {
                 // Buscar el contrato a actualizar por IdService y IdCustomer
                 var existingContract = _customerContext.Contracts
-                    .FirstOrDefault(c => c.idcustomer == updatedContract.idcustomer && c.idservice == updatedContract.idservice);
+                    .FirstOrDefault(c => c.rut == updatedContract.rut && c.idservice == updatedContract.idservice);
 
                 if (existingContract != null)
                 {

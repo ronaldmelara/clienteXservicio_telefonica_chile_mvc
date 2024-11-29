@@ -1,12 +1,10 @@
 
-interface Custormer {
-    idcustomer: number,
-    customer: string
-}
+
+/// <reference path="./interfaces.ts" />     
 
 document.addEventListener('DOMContentLoaded', () => {
     obtenerClientes().then(data => {
-
+        console.log(data);
         var table = $("#tblClientes").DataTable({
             data: data,
             columns: [
@@ -22,13 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                 },
                 {
-                    data: 'idcustomer',
-                    title: 'id',
-                    width: '70px'
+                    data: 'rut',
+                    title: 'rut',
+                    visible: false,
+                   
+                },
+                {
+                    data: 'rutdv',
+                    title: 'RUT',
+                    width: '100px',
+                    className: "text-center-datatable"
                 },
                 {
                     data: 'customer',
                     title: 'Cliente',
+                    className: "text-center-datatable",
                     render: function (data:string) {
                         // Renderiza el texto del cliente como texto editable
                         return `<span class="editable-cell">${data}</span>`;
@@ -75,13 +81,14 @@ function loadTableEvents(table: any): void {
         const newValue = row.find(".edit-input").val()?.toString().trim() || data.customer;
 
         // Guardar los cambios en el servidor (ejemplo usando fetch)
-        fetch(`/api/v1/customer/${data.idcustomer}/name`, {
+        fetch(`/api/v1/customer/${data.rut}/name`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                idcustomer: data.idcustomer,
+                rut: data.rut,
+                dv: data.dv,
                 customer: newValue,
             }),
         })
@@ -143,7 +150,7 @@ function loadTableEvents(table: any): void {
        
 
         // Guardar los cambios en el servidor (ejemplo usando fetch)
-        fetch(`/api/v1/customer/${data.idcustomer}/down`, {
+        fetch(`/api/v1/customer/${data.rut}/down`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -180,7 +187,9 @@ async function obtenerClientes(): Promise<Custormer[]> {
 
         return data.map(item => ({
             customer: item.customer,
-            idcustomer: item.idcustomer,
+            rut: item.rut,
+            dv: item.dv,
+            rutdv: item.rutdv
         }));  // Devolvemos los datos
     } catch (error) {
         console.error('Error al llamar la API:', error);
@@ -193,7 +202,7 @@ async function guardarNuevoCliente(): Promise<Custormer> {
     const newValue = document.getElementById('txtCliente') as HTMLInputElement;
     // row.find(".edit-input").val()?.toString().trim()
     // Guardar los cambios en el servidor (ejemplo usando fetch)
-    let defaultCust: Custormer = { idcustomer: 0, customer: "" };
+    let defaultCust: Custormer = { rut: 0, dv: "", customer: "", rutdv : '' };
     defaultCust.customer = $(newValue).val()?.toString().trim() ?? "";
     fetch(`/api/v1/customer/add`, {
         method: "POST",
@@ -224,7 +233,7 @@ async function guardarNuevoCliente(): Promise<Custormer> {
 }
 
 async function reloadCustomerTable(): Promise<void> {
-    const updatedData = await obtenerAreas(); // Llama a la función para obtener los datos actualizados
+    const updatedData = await obtenerClientes(); // Llama a la función para obtener los datos actualizados
     const table = $('#tblClientes').DataTable();
     table.clear(); // Limpia los datos actuales de la tabla
     table.rows.add(updatedData); // Agrega las nuevas filas
