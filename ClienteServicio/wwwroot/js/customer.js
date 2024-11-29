@@ -1,15 +1,8 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+import "./bootstrap/dist/js/bootstrap.bundle.js";
+import { validateRUN } from "./validadorRut.js";
 document.addEventListener('DOMContentLoaded', () => {
     obtenerClientes().then(data => {
+        console.log(data);
         var table = $("#tblClientes").DataTable({
             data: data,
             columns: [
@@ -25,13 +18,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                 },
                 {
-                    data: 'idcustomer',
-                    title: 'id',
-                    width: '70px'
+                    data: 'rut',
+                    title: 'rut',
+                    visible: false,
+                },
+                {
+                    data: 'rutdv',
+                    title: 'RUT',
+                    width: '100px',
+                    className: "text-center-datatable"
                 },
                 {
                     data: 'customer',
                     title: 'Cliente',
+                    className: "text-center-datatable",
                     render: function (data) {
                         // Renderiza el texto del cliente como texto editable
                         return `<span class="editable-cell">${data}</span>`;
@@ -60,19 +60,19 @@ function loadTableEvents(table) {
     });
     // Manejar evento de clic en el bot�n de guardar
     $("#tblClientes").on("click", ".save-button", function () {
-        var _a;
         const row = $(this).closest("tr");
         const data = table.row(row).data();
         // Obtener el nuevo valor del input
-        const newValue = ((_a = row.find(".edit-input").val()) === null || _a === void 0 ? void 0 : _a.toString().trim()) || data.customer;
+        const newValue = row.find(".edit-input").val()?.toString().trim() || data.customer;
         // Guardar los cambios en el servidor (ejemplo usando fetch)
-        fetch(`/api/v1/customer/${data.idcustomer}/name`, {
+        fetch(`/api/v1/customer/${data.rut}/name`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                idcustomer: data.idcustomer,
+                rut: data.rut,
+                dv: data.dv,
                 customer: newValue,
             }),
         })
@@ -98,8 +98,10 @@ function loadTableEvents(table) {
     if (myBtnNew) {
         myBtnNew.addEventListener('click', () => {
             const modal = document.getElementById('exampleModal');
-            const myModal = new bootstrap.Modal(modal);
-            myModal.show();
+            //const myModal = new Modal(modal);
+            //myModal.show();
+            var modalOb = $(modal);
+            modalOb.modal('show');
         });
     }
     const myBtnSaveNewCustomer = document.getElementById('btnSaveCustomer');
@@ -121,7 +123,7 @@ function loadTableEvents(table) {
         const data = table.row(row).data();
         // Obtener el nuevo valor del input
         // Guardar los cambios en el servidor (ejemplo usando fetch)
-        fetch(`/api/v1/customer/${data.idcustomer}/down`, {
+        fetch(`/api/v1/customer/${data.rut}/down`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -140,72 +142,134 @@ function loadTableEvents(table) {
             alert("Error al eliminar los cambios.");
         });
     });
+    // Asociar el evento al input
+    const rutInput = document.getElementById("txtRutCliente");
+    if (rutInput) {
+        rutInput.addEventListener("keydown", formatRutInput);
+    }
+    rutInput?.addEventListener("blur", (event) => {
+        const input = event.target;
+        const parts = input.value?.split("-");
+        const payload = {
+            run: parts[0],
+            dv: parts[1] // also can be a number
+        };
+        const response = validateRUN(payload);
+        console.log(response);
+    });
 }
-function obtenerClientes() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch('/api/v1/customer/all'); // Hacemos la solicitud GET
-            if (!response.ok) {
-                throw new Error('Error en la solicitud');
-            }
-            const data = yield response.json(); // Convertimos la respuesta a JSON
-            if (!Array.isArray(data)) {
-                throw new Error("Respuesta inesperada de la API");
-            }
-            return data.map(item => ({
-                customer: item.customer,
-                idcustomer: item.idcustomer,
-            })); // Devolvemos los datos
+async function obtenerClientes() {
+    try {
+        const response = await fetch('/api/v1/customer/all'); // Hacemos la solicitud GET
+        if (!response.ok) {
+            throw new Error('Error en la solicitud');
         }
-        catch (error) {
-            console.error('Error al llamar la API:', error);
-            return [];
+        const data = await response.json(); // Convertimos la respuesta a JSON
+        if (!Array.isArray(data)) {
+            throw new Error("Respuesta inesperada de la API");
         }
-    });
+        return data.map(item => ({
+            customer: item.customer,
+            rut: item.rut,
+            dv: item.dv,
+            rutdv: item.rutdv
+        })); // Devolvemos los datos
+    }
+    catch (error) {
+        console.error('Error al llamar la API:', error);
+        return [];
+    }
 }
-function guardarNuevoCliente() {
-    var _a, _b;
-    return __awaiter(this, void 0, void 0, function* () {
-        // Obtener el nuevo valor del input
-        const newValue = document.getElementById('txtCliente');
-        // row.find(".edit-input").val()?.toString().trim()
-        // Guardar los cambios en el servidor (ejemplo usando fetch)
-        let defaultCust = { idcustomer: 0, customer: "" };
-        defaultCust.customer = (_b = (_a = $(newValue).val()) === null || _a === void 0 ? void 0 : _a.toString().trim()) !== null && _b !== void 0 ? _b : "";
-        fetch(`/api/v1/customer/add`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(defaultCust),
-        })
-            .then((response) => {
-            if (!response.ok)
-                throw new Error("Error al guardar");
-            return response.json();
-        })
-            .then((data) => {
-            return data;
-            // Actualizar el valor en la tabla
-            //data.customer = newValue;
-            //table.row(row).data(data).invalidate();
-            //// Cambiar el bot�n de nuevo a "Editar"
-            //$(this).removeClass("save-button btn-success").addClass("edit-button btn-primary");
-            //$(this).find('i').removeClass("fa-save").addClass('fa-pencil');
-        })
-            .catch((error) => {
-            console.error(error);
-            alert("Error al guardar los cambios.");
-        });
-        return defaultCust;
+async function guardarNuevoCliente() {
+    // Obtener el nuevo valor del input
+    const newRut = document.getElementById('txtRutCliente');
+    const newValue = document.getElementById('txtNombreCliente');
+    // row.find(".edit-input").val()?.toString().trim()
+    // Guardar los cambios en el servidor (ejemplo usando fetch)
+    let defaultCust = { rut: 0, dv: "", customer: "", rutdv: '' };
+    defaultCust.customer = $(newValue).val()?.toString().trim() ?? "";
+    fetch(`/api/v1/customer/add`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(defaultCust),
+    })
+        .then((response) => {
+        if (!response.ok)
+            throw new Error("Error al guardar");
+        return response.json();
+    })
+        .then((data) => {
+        return data;
+        // Actualizar el valor en la tabla
+        //data.customer = newValue;
+        //table.row(row).data(data).invalidate();
+        //// Cambiar el bot�n de nuevo a "Editar"
+        //$(this).removeClass("save-button btn-success").addClass("edit-button btn-primary");
+        //$(this).find('i').removeClass("fa-save").addClass('fa-pencil');
+    })
+        .catch((error) => {
+        console.error(error);
+        alert("Error al guardar los cambios.");
     });
+    return defaultCust;
 }
-function reloadCustomerTable() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const updatedData = yield obtenerAreas(); // Llama a la funci�n para obtener los datos actualizados
-        const table = $('#tblClientes').DataTable();
-        table.clear(); // Limpia los datos actuales de la tabla
-        table.rows.add(updatedData); // Agrega las nuevas filas
-        table.draw(); // Redibuja la tabla
-    });
+async function reloadCustomerTable() {
+    const updatedData = await obtenerClientes(); // Llama a la funci�n para obtener los datos actualizados
+    const table = $('#tblClientes').DataTable();
+    table.clear(); // Limpia los datos actuales de la tabla
+    table.rows.add(updatedData); // Agrega las nuevas filas
+    table.draw(); // Redibuja la tabla
 }
+const formatRutInput = (event) => {
+    const input = event.target;
+    // Permitir solo n�meros, "K", guion y borrar
+    const allowedKeys = /^[0-9kK-]$/;
+    const key = event.key;
+    // Si el RUT ya tiene un d�gito verificador (K o n�mero), no permitir m�s entradas
+    if (input.value.includes("K") || input.value.length >= 12) {
+        if (key !== "Backspace" && key !== "Delete" && key !== "Tab") {
+            event.preventDefault();
+        }
+        return;
+    }
+    // Si el RUT ya contiene "K", no permitir ingresar m�s "K"
+    if (input.value.includes('K') && key.toUpperCase() === "K") {
+        event.preventDefault();
+        return;
+    }
+    // Si se presiona "K", debe ser considerado el d�gito verificador y no permitir m�s caracteres
+    if (key.toUpperCase() === "K" && input.value.length === 8) {
+        setTimeout(() => {
+            input.value = formatRut(input.value + "K"); // Agrega "K" y formatea
+        }, 0);
+        event.preventDefault();
+        return;
+    }
+    // Validar si la tecla presionada es permitida
+    if (!allowedKeys.test(key) && key !== "Backspace" && key !== "Delete" && key !== "Tab") {
+        event.preventDefault();
+        return;
+    }
+    // Usar timeout para esperar a que el valor se actualice antes de formatear
+    setTimeout(() => {
+        input.value = formatRut(input.value);
+    }, 0);
+};
+// Funci�n para formatear el RUT
+const formatRut = (rut) => {
+    // Limpia el RUT, eliminando cualquier car�cter que no sea n�mero o 'k'/'K'
+    const cleanRut = rut.replace(/[^0-9kK]/g, "").toUpperCase();
+    // Si ya tiene 9 caracteres, formateamos
+    if (cleanRut.length >= 2) {
+        const body = cleanRut.slice(0, -1); // Cuerpo (8 n�meros)
+        const dv = cleanRut.slice(-1); // D�gito verificador
+        // Agregar los puntos cada 3 d�gitos al cuerpo
+        const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        // Retornar el RUT formateado
+        return formattedBody + `-${dv}`;
+    }
+    // Si no tiene 9 caracteres, solo devolver el RUT limpio
+    return cleanRut;
+};

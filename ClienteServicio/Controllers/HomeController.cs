@@ -23,15 +23,6 @@ namespace ClienteServicio.Controllers
             _serviceRepository = serviceRepository;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -72,7 +63,7 @@ namespace ClienteServicio.Controllers
 
             foreach (Contract contract in contracts)
             {
-                var existingContract = _contractRepository.GetContract(contract.idservice, contract.idcustomer);
+                var existingContract = _contractRepository.GetContract(contract.idservice, contract.rut);
 
                 if (existingContract != null) {
 
@@ -87,7 +78,7 @@ namespace ClienteServicio.Controllers
                         var newContract = new Contract
                         {
                             active = contract.active,
-                            idcustomer = contract.idcustomer,
+                            rut = contract.rut,
                             idservice = contract.idservice,
                             updated = DateTime.Now
                         };

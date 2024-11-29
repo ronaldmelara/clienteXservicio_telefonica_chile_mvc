@@ -7,7 +7,7 @@
 <h4 class="display-4 o-title"><strong>Clientes</strong></h4>
 
 
-<script src="~/js/customer.js" asp-append-version="true"></script> <!-- Incluir el archivo JS compilado -->
+<script type="module" src="~/js/customer.js" asp-append-version="true"></script> <!-- Incluir el archivo JS compilado -->
 
 <div>
 
@@ -36,8 +36,12 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="exampleFormControlInput1" class="form-label">Cliente</label>
-                        <input class="form-control" type="text" placeholder="Nombre del Cliente" id="txtCliente" aria-label="Nombre del Cliente">
+                        <label for="txtRutCliente" class="form-label">RUT</label>
+                        <input class="form-control" type="text" placeholder="11.111.111-1" id="txtRutCliente" aria-label="RUT">
+                    </div>
+                    <div class="mb-3">
+                        <label for="txtNombreCliente" class="form-label">Cliente</label>
+                        <input class="form-control" type="text" placeholder="Empresa S.A" id="txtNombreCliente" aria-label="Nombre del Cliente">
                     </div>
                 </div>
                 <div class="modal-footer">

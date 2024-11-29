@@ -1,18 +1,8 @@
-﻿interface Service {
-     idservice: number,
-     service: string,
-     idarea: number
-}
+﻿
 
-interface Contract {
-    idservice: number;
-    idcustomer: number;
-    active: number;
-}
+import "./bootstrap/dist/js/bootstrap.bundle.js";
 
-interface CachedRowValues {
-    [key: string]: { [key: string]: boolean };
-}
+import { CachedRowValues, Contract, Service } from "./interfaces.js";
 
 const cachedRowValues: CachedRowValues = {};
 
@@ -20,7 +10,7 @@ enum enumArea {
     Cloud = 1,
     Cyber = 2,
 }
-const INITIAL_COLUMN_INDEX = 3;
+const INITIAL_COLUMN_INDEX = 5;
 
 let ListServices: Service[] = [];
 let colsCloud: number[] = [];
@@ -52,12 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     obtenerClientesServicios()
         .then(data => {
-
+          
             const columnasDinamicas = Object.keys(data[0]).map((key, index) => ({
-                title: key, // El nombre de la columna será la clave del objeto
+                title: index === 2 ? "RUT" :  key, // El nombre de la columna será la clave del objeto
                 data: key,   // La propiedad que representa el dato de esa columna
-                width: index === 1 ? '350px' : 'auto', // Aplica ancho fijo solo a la segunda columna (índice 1)
-                className: index === 1 ? 'colum' : '',
+                visible: index < 2 ? false : true,
+                width: (index === 3 ? '350px' : (index === 2 ? '100px' : 'auto')), // Aplica ancho fijo solo a la segunda columna (índice 1)
+                className: (index === 3 ? 'colum' : '') + " " + "text-center-datatable",
                 orderable: false,
                 render: (data: any) => (typeof data === 'boolean' ? renderCheckbox(data, key) :data),
             }));
@@ -65,12 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Insertar la columna de icono de edición al principio del array
             columnasDinamicas.unshift({
                 title: '',
-                data: '',                     // Sin un campo específico de datos (no mapeado a una propiedad)
+                data: '',
+                visible: true,// Sin un campo específico de datos (no mapeado a una propiedad)
                 width: 'auto',
                 className: 'dt-center editor-edit', // Para centrar el contenido
                 orderable: false,                // No ordenable
                 render:  () => '<button class="btn btn-primary edit-btn" data-status="none" ><i class="fa fa-pencil"></i></button>'
             });
+      
 
             var table = $("#miTabla").DataTable({
                 data: data,
@@ -81,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollCollapse: true,
 
                 fixedColumns: {
-                    start: 3  // Congela las dos primeras columnas
+                    start: 4  // Congela las dos primeras columnas
                 },
                 responsive: true,  // Asegura que la tabla se vea bien en dispositivos móviles
                 layout: {
@@ -138,8 +131,15 @@ document.addEventListener('DOMContentLoaded', () => {
             } as any); 
 
             $('#miTabla tbody').on('click', '.edit-btn', function () {
-                
-                ConfigCheckboxes(this);
+                const table = $('#miTabla').DataTable(); // Obtén la referencia al DataTable
+                const btn = $(this); // El botón que se hizo clic
+                const rowElement = btn.closest('tr'); // Obtiene el elemento <tr>
+                const rowIndex = table.row(rowElement).index(); // Índice de la fila en el DataTable
+
+                // Obtén los datos de la fila, incluyendo las columnas no visibles
+                const rowData = table.row(rowIndex).data();
+
+                ConfigCheckboxes(this, rowData);
                 
             });
 
@@ -216,11 +216,11 @@ function renderCheckbox(data: boolean, key:string): string {
     `;
 }
 
-function ConfigCheckboxes(button: HTMLButtonElement) {
+function ConfigCheckboxes(button: HTMLButtonElement, rowData:any) {
     const btn = $(button);
     // Obtener la fila que contiene el botón editado
     const row = btn.closest('tr');
-    const clientId = row.find('td').eq(1).text(); // Obtener el ID que está en la segunda celda (índice 1)
+    const rut = rowData[0]; // Obtener el ID que está en la segunda celda (índice 1)
     // Encontrar todos los checkboxes dentro de la fila
     const checkboxes = row.find('input[type="checkbox"]');
 
@@ -237,7 +237,7 @@ function ConfigCheckboxes(button: HTMLButtonElement) {
             rowValues[key] = isChecked;
         });
 
-        cachedRowValues[clientId] = rowValues;
+        cachedRowValues[rut] = rowValues;
 
 
         // Asegúrate de que el índice (2) corresponde a la columna correcta
@@ -252,7 +252,7 @@ function ConfigCheckboxes(button: HTMLButtonElement) {
         // Mostrar modal de confirmación antes de guardar
         showConfirmModal(
             () => {
-                saveChanges(checkboxes, clientId);
+                saveChanges(checkboxes, rut);
                 btn.attr('data-status', "none");
                 checkboxes.removeClass('enabled').addClass('disabled');
                 btn.removeClass('btn-danger').addClass('btn-primary');
@@ -266,8 +266,8 @@ function ConfigCheckboxes(button: HTMLButtonElement) {
                 checkboxes.prop('disabled', true);
                 btn.find('i').removeClass("fa-save").addClass('fa-pencil');
 
-                if (cachedRowValues[clientId]) {
-                    const originalValues = cachedRowValues[clientId];
+                if (cachedRowValues[rut]) {
+                    const originalValues = cachedRowValues[rut];
                     checkboxes.each((index, element) => {
                         const key = $(element).attr('data-key') || '';
                         $(element).prop('checked', originalValues[key]);
@@ -321,7 +321,7 @@ async function saveChanges(checkboxes: any, clientId: string): Promise<void> {
             const service = $(this).attr("data-key");
             const srvSelected = ListServices.find(srv => srv.service === service);
             if (srvSelected) {
-                elems.push({ idservice: srvSelected.idservice, idcustomer: Number(clientId), active: (isChecked ? 1 : 0) });
+                elems.push({ idservice: srvSelected.idservice, rut: Number(clientId), active: (isChecked ? 1 : 0) });
             }
 
             
@@ -329,6 +329,7 @@ async function saveChanges(checkboxes: any, clientId: string): Promise<void> {
     });
 
     try {
+        debugger;
         const data = await saveContracts(elems); // Esperar la promesa
         console.log('Data saved successfully:', data);
         // Puedes mostrar un mensaje de éxito aquí
@@ -339,14 +340,22 @@ async function saveChanges(checkboxes: any, clientId: string): Promise<void> {
 
 }
 
-function showConfirmModal(onConfirm: () => void, onCancel?: ()=> void) {
-    const modal = new bootstrap.Modal(document.getElementById('confirmSaveModal')!);
-    modal.show();
+function showConfirmModal(onConfirm: () => void, onCancel?: () => void) {
+
+
+    //const modal = new bootstrap.Modal(document.getElementById('confirmSaveModal')!);
+    //modal.show();
+
+    const modal = document.getElementById('confirmSaveModal') as HTMLElement;
+  
+
+    var modalOb = $(modal);
+    modalOb.modal('show');
 
     // Configurar el botón "Confirmar"
     $('#confirmSaveBtn').off('click').on('click', function () {
         onConfirm(); // Ejecuta la acción pasada como argumento
-        modal.hide(); // Cierra el modal
+        modalOb.modal("hide"); // Cierra el modal
     });
 
     if (onCancel) {

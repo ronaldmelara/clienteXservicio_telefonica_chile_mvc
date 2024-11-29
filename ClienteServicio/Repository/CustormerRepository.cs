@@ -17,8 +17,9 @@ namespace ClienteServicio.Repository
         {
             return  _customerContext.Customers.Select(c => new Customer()
             {
-                idcustomer = c.idcustomer,
-                customer = c.customer
+                rut = c.rut,
+                customer = c.customer,
+                dv = c.dv,
             }).ToList();
         }
 
@@ -42,9 +43,9 @@ namespace ClienteServicio.Repository
             _customerContext.SaveChanges();
         }
 
-        public Customer GetCustomerById(int id)
+        public Customer GetCustomerByRut(int rut)
         {
-            return _customerContext.Customers.FirstOrDefault(c=> c.idcustomer == id);
+            return _customerContext.Customers.FirstOrDefault(c=> c.rut == rut);
         }
     }
 }

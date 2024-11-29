@@ -28,8 +28,8 @@ table {
     clear: both;
     border-collapse: collapse;
     table-layout: fixed;
-    // ***********add this word-wrap:break-word;
-    // ***********and this
+    word-wrap:break-word;
+    
 }
 
 .colum {
@@ -146,3 +146,7 @@ table {
         z-index:-1000;
         display:none;
     }
+
+th.text-center-datatable {
+    text-align: center !important;
+}

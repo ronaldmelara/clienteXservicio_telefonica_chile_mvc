@@ -8,6 +8,6 @@ namespace ClienteServicio.Repository
         void Update(Customer customer);
         void Delete(Customer customer);
         Customer Add(Customer customer);
-        Customer GetCustomerById(int id);
+        Customer GetCustomerByRut(int rut);
     }
 }

@@ -1,20 +1,11 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+import "./bootstrap/dist/js/bootstrap.bundle.js";
 const cachedRowValues = {};
 var enumArea;
 (function (enumArea) {
     enumArea[enumArea["Cloud"] = 1] = "Cloud";
     enumArea[enumArea["Cyber"] = 2] = "Cyber";
 })(enumArea || (enumArea = {}));
-const INITIAL_COLUMN_INDEX = 3;
+const INITIAL_COLUMN_INDEX = 5;
 let ListServices = [];
 let colsCloud = [];
 let colsCyber = [];
@@ -37,10 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
     obtenerClientesServicios()
         .then(data => {
         const columnasDinamicas = Object.keys(data[0]).map((key, index) => ({
-            title: key,
+            title: index === 2 ? "RUT" : key,
             data: key,
-            width: index === 1 ? '350px' : 'auto',
-            className: index === 1 ? 'colum' : '',
+            visible: index < 2 ? false : true,
+            width: (index === 3 ? '350px' : (index === 2 ? '100px' : 'auto')),
+            className: (index === 3 ? 'colum' : '') + " " + "text-center-datatable",
             orderable: false,
             render: (data) => (typeof data === 'boolean' ? renderCheckbox(data, key) : data),
         }));
@@ -48,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         columnasDinamicas.unshift({
             title: '',
             data: '',
+            visible: true,
             width: 'auto',
             className: 'dt-center editor-edit',
             orderable: false,
@@ -60,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             /* scrollY: '400px',*/ // Ajusta la altura de la tabla si es necesario
             scrollCollapse: true,
             fixedColumns: {
-                start: 3 // Congela las dos primeras columnas
+                start: 4 // Congela las dos primeras columnas
             },
             responsive: true,
             layout: {
@@ -116,7 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         $('#miTabla tbody').on('click', '.edit-btn', function () {
-            ConfigCheckboxes(this);
+            const table = $('#miTabla').DataTable(); // Obtén la referencia al DataTable
+            const btn = $(this); // El botón que se hizo clic
+            const rowElement = btn.closest('tr'); // Obtiene el elemento <tr>
+            const rowIndex = table.row(rowElement).index(); // Índice de la fila en el DataTable
+            // Obtén los datos de la fila, incluyendo las columnas no visibles
+            const rowData = table.row(rowIndex).data();
+            ConfigCheckboxes(this, rowData);
         });
         $('#miTabla').on('change', '.cbService', function () {
             $(this).attr('data-status', "edited");
@@ -132,44 +131,40 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Error:', error); // Error manejado
     });
 });
-function obtenerClientesServicios() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch('/Home/GetAllContracts'); // Hacemos la solicitud GET
-            if (!response.ok) {
-                throw new Error('Error en la solicitud');
-            }
-            const data = yield response.json(); // Convertimos la respuesta a JSON
-            return data; // Devolvemos los datos
+async function obtenerClientesServicios() {
+    try {
+        const response = await fetch('/Home/GetAllContracts'); // Hacemos la solicitud GET
+        if (!response.ok) {
+            throw new Error('Error en la solicitud');
         }
-        catch (error) {
-            console.error('Error al llamar la API:', error);
-        }
-    });
+        const data = await response.json(); // Convertimos la respuesta a JSON
+        return data; // Devolvemos los datos
+    }
+    catch (error) {
+        console.error('Error al llamar la API:', error);
+    }
 }
-function obtenerServicios() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield fetch('/Home/GetAllServices'); // Hacemos la solicitud GET
-            if (!response.ok) {
-                throw new Error('Error en la solicitud');
-            }
-            const data = yield response.json(); // Convertimos la respuesta a JSON
-            if (!Array.isArray(data)) {
-                throw new Error("Respuesta inesperada de la API");
-            }
-            return data.map(item => ({
-                idservice: item.idservice,
-                service: item.service,
-                idarea: item.idarea,
-                enable: 0
-            })); // Devolvemos los datos
+async function obtenerServicios() {
+    try {
+        const response = await fetch('/Home/GetAllServices'); // Hacemos la solicitud GET
+        if (!response.ok) {
+            throw new Error('Error en la solicitud');
         }
-        catch (error) {
-            console.error('Error al llamar la API:', error);
-            return [];
+        const data = await response.json(); // Convertimos la respuesta a JSON
+        if (!Array.isArray(data)) {
+            throw new Error("Respuesta inesperada de la API");
         }
-    });
+        return data.map(item => ({
+            idservice: item.idservice,
+            service: item.service,
+            idarea: item.idarea,
+            enable: 0
+        })); // Devolvemos los datos
+    }
+    catch (error) {
+        console.error('Error al llamar la API:', error);
+        return [];
+    }
 }
 function renderCheckbox(data, key) {
     return `
@@ -184,11 +179,11 @@ function renderCheckbox(data, key) {
         </div>
     `;
 }
-function ConfigCheckboxes(button) {
+function ConfigCheckboxes(button, rowData) {
     const btn = $(button);
     // Obtener la fila que contiene el botón editado
     const row = btn.closest('tr');
-    const clientId = row.find('td').eq(1).text(); // Obtener el ID que está en la segunda celda (índice 1)
+    const rut = rowData[0]; // Obtener el ID que está en la segunda celda (índice 1)
     // Encontrar todos los checkboxes dentro de la fila
     const checkboxes = row.find('input[type="checkbox"]');
     if (btn.attr("data-status") === 'none') {
@@ -201,7 +196,7 @@ function ConfigCheckboxes(button) {
             // Guardar el valor original
             rowValues[key] = isChecked;
         });
-        cachedRowValues[clientId] = rowValues;
+        cachedRowValues[rut] = rowValues;
         // Asegúrate de que el índice (2) corresponde a la columna correcta
         checkboxes.removeClass('disabled').addClass('enabled');
         btn.removeClass('btn-primary').addClass('btn-danger');
@@ -212,7 +207,7 @@ function ConfigCheckboxes(button) {
     else if (btn.attr("data-status") === 'editing') {
         // Mostrar modal de confirmación antes de guardar
         showConfirmModal(() => {
-            saveChanges(checkboxes, clientId);
+            saveChanges(checkboxes, rut);
             btn.attr('data-status', "none");
             checkboxes.removeClass('enabled').addClass('disabled');
             btn.removeClass('btn-danger').addClass('btn-primary');
@@ -224,8 +219,8 @@ function ConfigCheckboxes(button) {
             btn.removeClass('btn-danger').addClass('btn-primary');
             checkboxes.prop('disabled', true);
             btn.find('i').removeClass("fa-save").addClass('fa-pencil');
-            if (cachedRowValues[clientId]) {
-                const originalValues = cachedRowValues[clientId];
+            if (cachedRowValues[rut]) {
+                const originalValues = cachedRowValues[rut];
                 checkboxes.each((index, element) => {
                     const key = $(element).attr('data-key') || '';
                     $(element).prop('checked', originalValues[key]);
@@ -262,38 +257,40 @@ function saveContracts(elems) {
         });
     });
 }
-function saveChanges(checkboxes, clientId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let elems = [];
-        checkboxes.each(function () {
-            const _status = $(this).attr("data-status");
-            if (_status === "edited") {
-                const isChecked = $(this).is(':checked');
-                const service = $(this).attr("data-key");
-                const srvSelected = ListServices.find(srv => srv.service === service);
-                if (srvSelected) {
-                    elems.push({ idservice: srvSelected.idservice, idcustomer: Number(clientId), active: (isChecked ? 1 : 0) });
-                }
+async function saveChanges(checkboxes, clientId) {
+    let elems = [];
+    checkboxes.each(function () {
+        const _status = $(this).attr("data-status");
+        if (_status === "edited") {
+            const isChecked = $(this).is(':checked');
+            const service = $(this).attr("data-key");
+            const srvSelected = ListServices.find(srv => srv.service === service);
+            if (srvSelected) {
+                elems.push({ idservice: srvSelected.idservice, rut: Number(clientId), active: (isChecked ? 1 : 0) });
             }
-        });
-        try {
-            const data = yield saveContracts(elems); // Esperar la promesa
-            console.log('Data saved successfully:', data);
-            // Puedes mostrar un mensaje de éxito aquí
-        }
-        catch (error) {
-            console.error('Error saving contracts:', error);
-            // Maneja el error aquí
         }
     });
+    try {
+        debugger;
+        const data = await saveContracts(elems); // Esperar la promesa
+        console.log('Data saved successfully:', data);
+        // Puedes mostrar un mensaje de éxito aquí
+    }
+    catch (error) {
+        console.error('Error saving contracts:', error);
+        // Maneja el error aquí
+    }
 }
 function showConfirmModal(onConfirm, onCancel) {
-    const modal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
-    modal.show();
+    //const modal = new bootstrap.Modal(document.getElementById('confirmSaveModal')!);
+    //modal.show();
+    const modal = document.getElementById('confirmSaveModal');
+    var modalOb = $(modal);
+    modalOb.modal('show');
     // Configurar el botón "Confirmar"
     $('#confirmSaveBtn').off('click').on('click', function () {
         onConfirm(); // Ejecuta la acción pasada como argumento
-        modal.hide(); // Cierra el modal
+        modalOb.modal("hide"); // Cierra el modal
     });
     if (onCancel) {
         $('#confirmSaveModal .btn-secondary').off('click').on('click', function () {
