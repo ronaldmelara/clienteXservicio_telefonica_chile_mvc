@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
     obtenerClientesServicios()
         .then(data => {
         const columnasDinamicas = Object.keys(data[0]).map((key, index) => ({
-            title: index === 2 ? "RUT" : key,
-            data: key,
+            title: index === 2 ? "RUT" : key, // El nombre de la columna será la clave del objeto
+            data: key, // La propiedad que representa el dato de esa columna
             visible: index < 2 ? false : true,
-            width: (index === 3 ? '350px' : (index === 2 ? '100px' : 'auto')),
+            width: (index === 3 ? '350px' : (index === 2 ? '100px' : 'auto')), // Aplica ancho fijo solo a la segunda columna (índice 1)
             className: (index === 3 ? 'colum' : '') + " " + "text-center-datatable",
             orderable: false,
             render: (data) => (typeof data === 'boolean' ? renderCheckbox(data, key) : data),
@@ -40,22 +40,22 @@ document.addEventListener('DOMContentLoaded', () => {
         columnasDinamicas.unshift({
             title: '',
             data: '',
-            visible: true,
+            visible: true, // Sin un campo específico de datos (no mapeado a una propiedad)
             width: 'auto',
-            className: 'dt-center editor-edit',
-            orderable: false,
+            className: 'dt-center editor-edit', // Para centrar el contenido
+            orderable: false, // No ordenable
             render: () => '<button class="btn btn-primary edit-btn" data-status="none" ><i class="fa fa-pencil"></i></button>'
         });
         var table = $("#miTabla").DataTable({
             data: data,
             columns: columnasDinamicas,
-            scrollX: true,
+            scrollX: true, // Permite el desplazamiento horizontal
             /* scrollY: '400px',*/ // Ajusta la altura de la tabla si es necesario
             scrollCollapse: true,
             fixedColumns: {
                 start: 4 // Congela las dos primeras columnas
             },
-            responsive: true,
+            responsive: true, // Asegura que la tabla se vea bien en dispositivos móviles
             layout: {
                 topStart: {
                     buttons: [
@@ -81,11 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         {
                             extend: 'excelHtml5',
-                            text: '<i class="fa fa-file-excel-o"></i> Export to Excel',
-                            className: 'btn btn-success',
+                            text: '<i class="fa fa-file-excel-o"></i> Export to Excel', // Texto e ícono
+                            className: 'btn btn-success', // Clase de Bootstrap para el botón
                             exportOptions: {
                                 /* columns: ':visible', // Exporta solo las columnas visibles*/
-                                columns: ':not(:first-child)',
+                                columns: ':not(:first-child)', // Excluir la primera columna
                                 format: {
                                     body: (data, row, column, node) => {
                                         // Si la columna contiene un checkbox

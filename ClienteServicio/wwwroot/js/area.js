@@ -3,7 +3,7 @@ import "./bootstrap/dist/js/bootstrap.bundle.js";
 let selectedAreaId = null;
 let isSuggestionSelected = false; // Variable para controlar si se seleccion� una sugerencia
 let selectedSuggestion = {
-    idservice: 0,
+    idservice: 0, // Valor predeterminado
     service: "",
     idarea: 0,
     enable: 0,
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rowGroup: {
                 dataSrc: 'area' // Agrupa por el campo "areaName"
             },
-            paging: false,
+            paging: false, // Desactiva la paginaci�n
             searching: false, // Desactiva la barra de b�squeda
         });
         loadTypeahead();
