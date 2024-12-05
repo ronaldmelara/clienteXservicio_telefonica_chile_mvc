@@ -16,7 +16,8 @@
     src: url('../woff2/telefonica_sans_bold.woff2') format('woff2');
 }
 html {
-  font-size: 10px;
+    font-size: 10px;
+    
 }
 
 @media (min-width: 768px) {

@@ -1,0 +1,20 @@
+﻿html {
+    font-size: 10px;
+    background: url(../img/TFN_Fondo.jpg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+body{
+    background-color: unset;
+}
+
+.card-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: #031A34 !important;
+    /* #0066ff; */
+    padding: 15px !important;
+}
