@@ -1,6 +1,9 @@
 
 
-/// <reference path="./interfaces.ts" />     
+
+import "./bootstrap/dist/js/bootstrap.bundle.js";
+import { Custormer, Service } from "./interfaces.js";
+import { validateRUN, IRun } from "./validadorRut.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     obtenerClientes().then(data => {
@@ -117,8 +120,10 @@ function loadTableEvents(table: any): void {
         myBtnNew.addEventListener('click', () => {
 
             const modal = document.getElementById('exampleModal') as HTMLElement;
-            const myModal = new bootstrap.Modal(modal);
-            myModal.show();
+            //const myModal = new Modal(modal);
+            //myModal.show();
+            var modalOb = $(modal);
+            modalOb.modal('show');
          
         });
     }
@@ -169,6 +174,27 @@ function loadTableEvents(table: any): void {
                 alert("Error al eliminar los cambios.");
             });
     });
+
+
+    // Asociar el evento al input
+    const rutInput = document.getElementById("txtRutCliente");
+    if (rutInput) {
+        rutInput.addEventListener("keydown", formatRutInput);
+    }
+
+    rutInput?.addEventListener("blur", (event: Event) => {
+        const input = event.target as HTMLInputElement;
+        
+        const parts = input.value?.split("-");
+        const payload: IRun = {
+            run: parts[0], // also can be a number or string without dots
+            dv: parts[1] // also can be a number
+        };
+
+        const response: Boolean = validateRUN(payload);
+
+        console.log(response);
+    })
 }
 
 
@@ -199,7 +225,8 @@ async function obtenerClientes(): Promise<Custormer[]> {
 
 async function guardarNuevoCliente(): Promise<Custormer> {
     // Obtener el nuevo valor del input
-    const newValue = document.getElementById('txtCliente') as HTMLInputElement;
+    const newRut = document.getElementById('txtRutCliente') as HTMLInputElement;
+    const newValue = document.getElementById('txtNombreCliente') as HTMLInputElement;
     // row.find(".edit-input").val()?.toString().trim()
     // Guardar los cambios en el servidor (ejemplo usando fetch)
     let defaultCust: Custormer = { rut: 0, dv: "", customer: "", rutdv : '' };
@@ -239,3 +266,70 @@ async function reloadCustomerTable(): Promise<void> {
     table.rows.add(updatedData); // Agrega las nuevas filas
     table.draw(); // Redibuja la tabla
 }
+
+
+const formatRutInput = (event: KeyboardEvent): void => {
+
+
+    const input = event.target as HTMLInputElement;
+
+    // Permitir solo números, "K", guion y borrar
+    const allowedKeys = /^[0-9kK-]$/;
+    const key = event.key;
+
+    // Si el RUT ya tiene un dígito verificador (K o número), no permitir más entradas
+    if (input.value.includes("K") || input.value.length >= 12) {
+        if (key !== "Backspace" && key !== "Delete" && key !== "Tab") {
+            event.preventDefault();
+        }
+        return;
+    }
+
+    // Si el RUT ya contiene "K", no permitir ingresar más "K"
+    if (input.value.includes('K') && key.toUpperCase() === "K") {
+        event.preventDefault();
+        return;
+    }
+
+    // Si se presiona "K", debe ser considerado el dígito verificador y no permitir más caracteres
+    if (key.toUpperCase() === "K" && input.value.length === 8) {
+        setTimeout(() => {
+            input.value = formatRut(input.value + "K"); // Agrega "K" y formatea
+        }, 0);
+        event.preventDefault();
+        return;
+    }
+
+    // Validar si la tecla presionada es permitida
+    if (!allowedKeys.test(key) && key !== "Backspace" && key !== "Delete" && key !== "Tab") {
+        event.preventDefault();
+        return;
+    }
+
+    // Usar timeout para esperar a que el valor se actualice antes de formatear
+    setTimeout(() => {
+        input.value = formatRut(input.value);
+    }, 0);
+};
+
+// Función para formatear el RUT
+const formatRut = (rut: string): string => {
+
+    // Limpia el RUT, eliminando cualquier carácter que no sea número o 'k'/'K'
+    const cleanRut = rut.replace(/[^0-9kK]/g, "").toUpperCase();
+
+    // Si ya tiene 9 caracteres, formateamos
+    if (cleanRut.length >= 2 ) {
+        const body = cleanRut.slice(0, -1); // Cuerpo (8 números)
+        const dv = cleanRut.slice(-1);      // Dígito verificador
+
+        // Agregar los puntos cada 3 dígitos al cuerpo
+        const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        // Retornar el RUT formateado
+        return formattedBody + `-${dv}`;
+    }
+
+    // Si no tiene 9 caracteres, solo devolver el RUT limpio
+    return cleanRut;
+};

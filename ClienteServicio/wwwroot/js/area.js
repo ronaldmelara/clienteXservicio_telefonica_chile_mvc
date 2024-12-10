@@ -1,5 +1,4 @@
-"use strict";
-/// <reference path="./interfaces.ts" />     
+import "./bootstrap/dist/js/bootstrap.bundle.js";
 // Variables para almacenar el �rea seleccionada y los servicios cargados
 let selectedAreaId = null;
 let isSuggestionSelected = false; // Variable para controlar si se seleccion� una sugerencia
@@ -263,8 +262,8 @@ function loadButtons() {
     if (myBtnEditService) {
         myBtnEditService.addEventListener('click', () => {
             const modal = document.getElementById('mdEditServicio');
-            const myModal = new bootstrap.Modal(modal);
-            myModal.show();
+            var modalOb = $(modal);
+            modalOb.modal('show');
         });
     }
 }
@@ -273,9 +272,8 @@ function hidePopupService() {
     const modalElement = document.getElementById('mdEditServicio');
     // Inicializa el modal si no est� inicializado
     if (modalElement) {
-        const myModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-        // Llama a hide() para cerrarlo
-        myModal.hide();
+        var modalOb = $(modalElement);
+        modalOb.modal('hide');
     }
     else {
         console.error('Modal element not found');

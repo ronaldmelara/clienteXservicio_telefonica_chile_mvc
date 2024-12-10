@@ -1,5 +1,5 @@
-"use strict";
-/// <reference path="./interfaces.ts" />     
+import "./bootstrap/dist/js/bootstrap.bundle.js";
+import { validateRUN } from "./validadorRut.js";
 document.addEventListener('DOMContentLoaded', () => {
     obtenerClientes().then(data => {
         console.log(data);
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                 }
             ],
-            scrollX: true, // Permite el desplazamiento horizontal
+            scrollX: true,
             /* scrollY: '400px',*/ // Ajusta la altura de la tabla si es necesario
             scrollCollapse: true,
             responsive: true, // Asegura que la tabla se vea bien en dispositivos m�viles
@@ -98,8 +98,10 @@ function loadTableEvents(table) {
     if (myBtnNew) {
         myBtnNew.addEventListener('click', () => {
             const modal = document.getElementById('exampleModal');
-            const myModal = new bootstrap.Modal(modal);
-            myModal.show();
+            //const myModal = new Modal(modal);
+            //myModal.show();
+            var modalOb = $(modal);
+            modalOb.modal('show');
         });
     }
     const myBtnSaveNewCustomer = document.getElementById('btnSaveCustomer');
@@ -140,6 +142,21 @@ function loadTableEvents(table) {
             alert("Error al eliminar los cambios.");
         });
     });
+    // Asociar el evento al input
+    const rutInput = document.getElementById("txtRutCliente");
+    if (rutInput) {
+        rutInput.addEventListener("keydown", formatRutInput);
+    }
+    rutInput?.addEventListener("blur", (event) => {
+        const input = event.target;
+        const parts = input.value?.split("-");
+        const payload = {
+            run: parts[0],
+            dv: parts[1] // also can be a number
+        };
+        const response = validateRUN(payload);
+        console.log(response);
+    });
 }
 async function obtenerClientes() {
     try {
@@ -165,7 +182,8 @@ async function obtenerClientes() {
 }
 async function guardarNuevoCliente() {
     // Obtener el nuevo valor del input
-    const newValue = document.getElementById('txtCliente');
+    const newRut = document.getElementById('txtRutCliente');
+    const newValue = document.getElementById('txtNombreCliente');
     // row.find(".edit-input").val()?.toString().trim()
     // Guardar los cambios en el servidor (ejemplo usando fetch)
     let defaultCust = { rut: 0, dv: "", customer: "", rutdv: '' };
@@ -204,3 +222,54 @@ async function reloadCustomerTable() {
     table.rows.add(updatedData); // Agrega las nuevas filas
     table.draw(); // Redibuja la tabla
 }
+const formatRutInput = (event) => {
+    const input = event.target;
+    // Permitir solo n�meros, "K", guion y borrar
+    const allowedKeys = /^[0-9kK-]$/;
+    const key = event.key;
+    // Si el RUT ya tiene un d�gito verificador (K o n�mero), no permitir m�s entradas
+    if (input.value.includes("K") || input.value.length >= 12) {
+        if (key !== "Backspace" && key !== "Delete" && key !== "Tab") {
+            event.preventDefault();
+        }
+        return;
+    }
+    // Si el RUT ya contiene "K", no permitir ingresar m�s "K"
+    if (input.value.includes('K') && key.toUpperCase() === "K") {
+        event.preventDefault();
+        return;
+    }
+    // Si se presiona "K", debe ser considerado el d�gito verificador y no permitir m�s caracteres
+    if (key.toUpperCase() === "K" && input.value.length === 8) {
+        setTimeout(() => {
+            input.value = formatRut(input.value + "K"); // Agrega "K" y formatea
+        }, 0);
+        event.preventDefault();
+        return;
+    }
+    // Validar si la tecla presionada es permitida
+    if (!allowedKeys.test(key) && key !== "Backspace" && key !== "Delete" && key !== "Tab") {
+        event.preventDefault();
+        return;
+    }
+    // Usar timeout para esperar a que el valor se actualice antes de formatear
+    setTimeout(() => {
+        input.value = formatRut(input.value);
+    }, 0);
+};
+// Funci�n para formatear el RUT
+const formatRut = (rut) => {
+    // Limpia el RUT, eliminando cualquier car�cter que no sea n�mero o 'k'/'K'
+    const cleanRut = rut.replace(/[^0-9kK]/g, "").toUpperCase();
+    // Si ya tiene 9 caracteres, formateamos
+    if (cleanRut.length >= 2) {
+        const body = cleanRut.slice(0, -1); // Cuerpo (8 n�meros)
+        const dv = cleanRut.slice(-1); // D�gito verificador
+        // Agregar los puntos cada 3 d�gitos al cuerpo
+        const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        // Retornar el RUT formateado
+        return formattedBody + `-${dv}`;
+    }
+    // Si no tiene 9 caracteres, solo devolver el RUT limpio
+    return cleanRut;
+};

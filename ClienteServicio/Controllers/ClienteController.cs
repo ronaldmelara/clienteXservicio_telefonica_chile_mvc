@@ -1,9 +1,11 @@
 ﻿using ClienteServicio.Models;
 using ClienteServicio.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClienteServicio.Controllers
 {
+    [Authorize]
     [Route("api/v1/customer/")]
     public class ClienteController : Controller
     {

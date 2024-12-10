@@ -1,9 +1,11 @@
 ﻿using ClienteServicio.Models;
 using ClienteServicio.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClienteServicio.Controllers
 {
+    [Authorize]
     public class AreaController : Controller
     {
 

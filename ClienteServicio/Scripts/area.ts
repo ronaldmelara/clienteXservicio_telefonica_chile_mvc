@@ -1,6 +1,7 @@
 
+import "./bootstrap/dist/js/bootstrap.bundle.js";
 
-/// <reference path="./interfaces.ts" />     
+import { Service, Area } from "./interfaces.js";
 
 // Variables para almacenar el área seleccionada y los servicios cargados
 let selectedAreaId: number | null = null;
@@ -311,8 +312,12 @@ function loadButtons(): void {
         myBtnEditService.addEventListener('click', () => {
 
             const modal = document.getElementById('mdEditServicio') as HTMLElement;
-            const myModal = new bootstrap.Modal(modal);
-            myModal.show();
+
+
+
+            var modalOb = $(modal);
+            modalOb.modal('show');
+    
         });
     }
 
@@ -324,10 +329,8 @@ function hidePopupService(): void {
 
     // Inicializa el modal si no está inicializado
     if (modalElement) {
-        const myModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-
-        // Llama a hide() para cerrarlo
-        myModal.hide();
+        var modalOb = $(modalElement);
+        modalOb.modal('hide');
     } else {
         console.error('Modal element not found');
     }

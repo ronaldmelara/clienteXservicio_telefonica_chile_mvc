@@ -1,5 +1,6 @@
 using ClienteServicio.Models;
 using ClienteServicio.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Text.Json;
 
 namespace ClienteServicio.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

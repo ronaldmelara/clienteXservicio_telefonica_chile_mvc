@@ -1,7 +1,8 @@
 ﻿
 
-/// <reference path="./interfaces.ts" />                                                   
+import "./bootstrap/dist/js/bootstrap.bundle.js";
 
+import { CachedRowValues, Contract, Service } from "./interfaces.js";
 
 const cachedRowValues: CachedRowValues = {};
 
@@ -339,14 +340,19 @@ async function saveChanges(checkboxes: any, clientId: string): Promise<void> {
 
 }
 
-function showConfirmModal(onConfirm: () => void, onCancel?: ()=> void) {
-    const modal = new bootstrap.Modal(document.getElementById('confirmSaveModal')!);
-    modal.show();
+function showConfirmModal(onConfirm: () => void, onCancel?: () => void) {
+
+
+    const modal = document.getElementById('confirmSaveModal') as HTMLElement;
+  
+
+    var modalOb = $(modal);
+    modalOb.modal('show');
 
     // Configurar el botón "Confirmar"
     $('#confirmSaveBtn').off('click').on('click', function () {
         onConfirm(); // Ejecuta la acción pasada como argumento
-        modal.hide(); // Cierra el modal
+        modalOb.modal("hide"); // Cierra el modal
     });
 
     if (onCancel) {

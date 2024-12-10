@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = "";
+}
+@model LoginViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv=”Content-Type” content=”text/html; charset=ISO-8859-1″ />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/login.css" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-center d-flex justify-content-center">
+                        <img src="~/img/ttech_icon.png" width="200px" height="40px" class="mx-auto d-block" />
+                    </div>
+                    <div class="card-body p-5">
+                        <form id="loginForm" class="needs-validation" novalidate>
+                            <div class="form-group">
+                                <label for="UserName">Usuario</label>
+                                <input type="text" class="form-control" id="UserName" name="UserName" required size="20" maxlength="20">
+                                <div class="invalid-feedback">
+                                    Debe de ingresar su usuario.
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="Password">Contraseña</label>
+                                <input type="password" class="form-control" id="Password" name="Password" required size="25" maxlength="25">
+                                <div class="invalid-feedback">
+                                    Debe de ingresar su contraseña.
+                                </div>
+                            </div>
+                            <button type="button" id="loginButton" class="btn btn-primary btn-block mt-3">Iniciar Sesión</button>
+                        </form>
+                        <p id="errorMessage" class="text-danger mt-3 text-center fs-5 fw-bold"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="~/js/account.js" asp-append-version="true"></script>
+</body>
+</html>
