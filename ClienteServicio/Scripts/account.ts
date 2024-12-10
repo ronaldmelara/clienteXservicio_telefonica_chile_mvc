@@ -1,4 +1,4 @@
-
+Ôªø
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -7,10 +7,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function InitEvents(): void {
-    document.getElementById("loginButton")?.addEventListener("click", async () => {
+
+    
+
+
+    document.getElementById("loginButton")?.addEventListener("click", async (event) => {
+
+        // Evitar el comportamiento predeterminado del bot√≥n si es parte de un formulario
+        event.preventDefault();
+
+        const form = document.querySelector(".needs-validation") as HTMLFormElement; // Selecciona el formulario
+        if (!form) return; // Verifica que el formulario exista
+
+
+
+        if (!form.checkValidity()) {
+            form.classList.add("was-validated"); // Aplica las clases de Bootstrap para mostrar errores
+            return; // Detiene el proceso si el formulario no es v√°lido
+        }
+
+        const loginButton = document.getElementById("loginButton") as HTMLButtonElement;
         const userName = (document.getElementById("UserName") as HTMLInputElement).value;
         const password = (document.getElementById("Password") as HTMLInputElement).value;
         const errorMessage = document.getElementById("errorMessage") as HTMLDivElement;
+
+        $(loginButton).attr("disabled", "disabled");
 
         // Preparar datos
         const loginData = {
@@ -28,7 +49,7 @@ function InitEvents(): void {
             });
 
             if (response.redirected) {
-                // Si hay una redirecciÛn, seguirla
+                // Si hay una redirecci√≥n, seguirla
                 window.location.href = response.url;
                 return;
             }
@@ -39,10 +60,12 @@ function InitEvents(): void {
                 return;
             }
 
-            // Si la solicitud no redirige ni tiene errores explÌcitos, manejamos otros casos aquÌ
-            errorMessage.textContent = "AutenticaciÛn fallida.";
+            // Si la solicitud no redirige ni tiene errores expl√≠citos, manejamos otros casos aqu√≠
+            errorMessage.textContent = "Autenticaci√≥n fallida. Int√©ntelo nuevamente.";
+            $(loginButton).removeAttr("disabled");
         } catch (error) {
-            errorMessage.textContent = "Error de conexiÛn con el servidor.";
+            errorMessage.textContent = "Error de conexi√≥n con el servidor.";
+            $(loginButton).removeAttr("disabled");
         }
     });
 }

@@ -33,7 +33,7 @@ namespace ClienteServicio.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public IActionResult Login([FromBody]  LoginViewModel model)
+        public IActionResult Login([FromBody] LoginViewModel model)
         {
             try
             {
@@ -43,10 +43,11 @@ namespace ClienteServicio.Controllers
 
                 // Crear claims para identificar al usuario
                 var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.IdUser),
-                new Claim(ClaimTypes.Role, user.UserRoles.First().Role.Rol)
-            };
+                {
+                        new Claim(ClaimTypes.Name, user.Name),
+                    new Claim(ClaimTypes.NameIdentifier, user.IdUser),
+                    new Claim(ClaimTypes.Role, user.UserRoles.First().Role.Rol)
+                };
 
                 // Crear el ticket de autenticación
                 var claimsIdentity = new ClaimsIdentity(claims, "CookieAuth");
@@ -56,7 +57,7 @@ namespace ClienteServicio.Controllers
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
                 };
 
-                 HttpContext.SignInAsync("CookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
+                HttpContext.SignInAsync("CookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
 
 
                 return RedirectToAction("Home", "View");
@@ -90,7 +91,7 @@ namespace ClienteServicio.Controllers
             // Crear nuevo usuario
             var newUser = new User
             {
-                IdUser =model.UserName,
+                IdUser = model.UserName,
                 Name = model.Name,
                 Email = model.Email,
                 Pass = PasswordHelper.HashPassword(model.Password), // Encriptar contraseña
@@ -98,7 +99,7 @@ namespace ClienteServicio.Controllers
                 Created = DateTime.Now
             };
             _accountRepository.Save(newUser);
-            
+
 
             return RedirectToAction("Login");
         }

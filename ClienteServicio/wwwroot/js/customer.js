@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                 }
             ],
-            scrollX: true, // Permite el desplazamiento horizontal
+            scrollX: true,
             /* scrollY: '400px',*/ // Ajusta la altura de la tabla si es necesario
             scrollCollapse: true,
             responsive: true, // Asegura que la tabla se vea bien en dispositivos m�viles
@@ -151,7 +151,7 @@ function loadTableEvents(table) {
         const input = event.target;
         const parts = input.value?.split("-");
         const payload = {
-            run: parts[0], // also can be a number or string without dots
+            run: parts[0],
             dv: parts[1] // also can be a number
         };
         const response = validateRUN(payload);

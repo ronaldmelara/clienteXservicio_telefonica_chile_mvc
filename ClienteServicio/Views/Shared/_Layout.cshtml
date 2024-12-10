@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
+    <meta http-equiv=”Content-Type” content=”text/html; charset=ISO-8859-1″ />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ClienteServicio</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -39,12 +39,18 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark m-navdocuments_item-link" asp-area="" asp-controller="View" asp-action="Service">Servicios</a>
                         </li>
-                        <li class="nav-item">
-                            <a asp-controller="Account" asp-action="Logout" class="btn btn-danger">Cerrar Sesión</a>
-                        </li>
-
+                      
                         
                     </ul>
+                </div>
+                <div class="m-lg-auto">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <span class="navbar-text">
+                            Bienvenido, @User.Identity.Name (@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                            <a class="btn btn-link" asp-controller="Account" asp-action="Logout">Cerrar sesión</a>
+                        </span>
+                    }
                 </div>
             </div>
         </nav>
@@ -62,7 +68,7 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
     <script src="~/lib/jquery/dist/jquery.js"></script> <!-- jQuery -->
     <script src="~/lib/datatables/js/dataTables.js"></script> <!-- DataTables -->
     <!-- Includes all JS & CSS for the JavaScript Data Grid -->

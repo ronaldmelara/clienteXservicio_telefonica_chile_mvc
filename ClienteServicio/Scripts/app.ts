@@ -343,9 +343,6 @@ async function saveChanges(checkboxes: any, clientId: string): Promise<void> {
 function showConfirmModal(onConfirm: () => void, onCancel?: () => void) {
 
 
-    //const modal = new bootstrap.Modal(document.getElementById('confirmSaveModal')!);
-    //modal.show();
-
     const modal = document.getElementById('confirmSaveModal') as HTMLElement;
   
 
