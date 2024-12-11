@@ -65,7 +65,7 @@ namespace ClienteServicio.Controllers
 
             foreach (Contract contract in contracts)
             {
-                var existingContract = _contractRepository.GetContract(contract.idservice, contract.rut);
+                var existingContract = _contractRepository.GetContract(contract.idservice, contract.rut, contract.dv);
 
                 if (existingContract != null) {
 
@@ -81,6 +81,7 @@ namespace ClienteServicio.Controllers
                         {
                             active = contract.active,
                             rut = contract.rut,
+                            dv = contract.dv,
                             idservice = contract.idservice,
                             updated = DateTime.Now
                         };

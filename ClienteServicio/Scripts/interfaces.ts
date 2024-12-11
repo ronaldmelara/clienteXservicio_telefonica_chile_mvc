@@ -8,6 +8,7 @@
 export interface Contract {
     idservice: number;
     rut: number;
+    dv: string;
     active: number;
 }
 

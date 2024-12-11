@@ -36,7 +36,7 @@ namespace ClienteServicio.Controllers
         [HttpPut("{rut}/name")]
         public IActionResult UpdateName(int rut, [FromBody] Customer newCustomer)
         {
-            var customer = _customerRepository.GetCustomerByRut(rut);
+            var customer = _customerRepository.GetCustomerByRut(newCustomer.rut, newCustomer.dv);
             if (customer == null)
             {
                 return NotFound(new { message = "Customer not found." });
@@ -71,10 +71,10 @@ namespace ClienteServicio.Controllers
         }
 
 
-        [HttpDelete("{id}/down")]
-        public IActionResult Remove(int id)
+        [HttpDelete("{id}/{dv}/down")]
+        public IActionResult Remove(int id, string dv)
         {
-            var cust = _customerRepository.GetCustomerByRut(id);
+            var cust = _customerRepository.GetCustomerByRut(id, dv);
             if (cust == null)
             {
                 return NotFound(new { message = "Customer not found." });

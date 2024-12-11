@@ -5,7 +5,7 @@ namespace ClienteServicio.Models
 {
     public class Customer
     {
-        [Key]
+       
         public int rut { get; set; }
         public string dv { get; set; }
         public string customer { get; set; }

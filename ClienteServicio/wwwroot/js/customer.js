@@ -23,6 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     visible: false,
                 },
                 {
+                    data: 'dv',
+                    title: 'dv',
+                    visible: false,
+                },
+                {
                     data: 'rutdv',
                     title: 'RUT',
                     width: '100px',
@@ -106,16 +111,20 @@ function loadTableEvents(table) {
     }
     const myBtnSaveNewCustomer = document.getElementById('btnSaveCustomer');
     if (myBtnSaveNewCustomer) {
-        myBtnSaveNewCustomer.addEventListener('click', () => {
+        myBtnSaveNewCustomer.addEventListener('click', async (event) => {
+            // Evitar el comportamiento predeterminado del bot�n si es parte de un formulario
+            event.preventDefault();
+            const form = document.getElementById("customerForm"); // Selecciona el formulario
+            if (!form)
+                return; // Verifica que el formulario exista
+            if (!form.checkValidity()) {
+                form.classList.add("was-validated"); // Aplica las clases de Bootstrap para mostrar errores
+                return; // Detiene el proceso si el formulario no es v�lido
+            }
             guardarNuevoCliente().then(newId => {
                 console.log(`El ID del nuevo cliente es: ${newId}`);
                 reloadCustomerTable();
             });
-            //addService(selectedSuggestion).then(newId => {
-            //    console.log(`El ID del nuevo servicio es: ${newId}`);
-            //}).catch(error => {
-            //    console.error('Error al agregar el servicio:', error);
-            //});
         });
     }
     $("#tblClientes").on("click", ".del-button", function () {
@@ -123,7 +132,7 @@ function loadTableEvents(table) {
         const data = table.row(row).data();
         // Obtener el nuevo valor del input
         // Guardar los cambios en el servidor (ejemplo usando fetch)
-        fetch(`/api/v1/customer/${data.rut}/down`, {
+        fetch(`/api/v1/customer/${data.rut}/${data.dv}/down`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -182,12 +191,15 @@ async function obtenerClientes() {
 }
 async function guardarNuevoCliente() {
     // Obtener el nuevo valor del input
-    const newRut = document.getElementById('txtRutCliente');
-    const newValue = document.getElementById('txtNombreCliente');
+    const newRut = $('#txtRutCliente').val() ?? '';
+    const newValue = $('#txtNombreCliente').val() ?? '';
     // row.find(".edit-input").val()?.toString().trim()
     // Guardar los cambios en el servidor (ejemplo usando fetch)
     let defaultCust = { rut: 0, dv: "", customer: "", rutdv: '' };
-    defaultCust.customer = $(newValue).val()?.toString().trim() ?? "";
+    defaultCust.dv = newRut ? newRut.split('-')[1] : '';
+    let res = newRut ? Number((newRut.split('-')[0]).replaceAll('.', '')) : 0;
+    defaultCust.rut = newRut ? res : 0;
+    defaultCust.customer = newValue?.toString().trim() ?? "";
     fetch(`/api/v1/customer/add`, {
         method: "POST",
         headers: {
@@ -201,6 +213,8 @@ async function guardarNuevoCliente() {
         return response.json();
     })
         .then((data) => {
+        $('#txtRutCliente').val('');
+        $('#txtNombreCliente').val('');
         return data;
         // Actualizar el valor en la tabla
         //data.customer = newValue;

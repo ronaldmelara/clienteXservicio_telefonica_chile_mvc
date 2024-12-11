@@ -22,7 +22,7 @@
             <table id="tblClientes" class="table table-striped" style="width:100%">
             </table>
         </div>
-       
+
     </div>
 
 
@@ -35,14 +35,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="txtRutCliente" class="form-label">RUT</label>
-                        <input class="form-control" type="text" placeholder="11.111.111-1" id="txtRutCliente" aria-label="RUT">
-                    </div>
-                    <div class="mb-3">
-                        <label for="txtNombreCliente" class="form-label">Cliente</label>
-                        <input class="form-control" type="text" placeholder="Empresa S.A" id="txtNombreCliente" aria-label="Nombre del Cliente">
-                    </div>
+                    <form id="customerForm" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="txtRutCliente" class="form-label">RUT</label>
+                            <input class="form-control" type="text" placeholder="11.111.111-1" id="txtRutCliente" aria-label="RUT" maxlength="12" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="txtNombreCliente" class="form-label">Cliente</label>
+                            <input class="form-control" type="text" placeholder="Empresa S.A" id="txtNombreCliente" aria-label="Nombre del Cliente" maxlength="200" required>
+                        </div>
+                    </form>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

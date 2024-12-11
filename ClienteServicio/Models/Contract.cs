@@ -10,5 +10,6 @@ namespace ClienteServicio.Models
         public int idservice { get; set; }
         public DateTime updated { get; set; }
         public int active { get; set; }
+        public string dv {  get; set; }
     }
 }

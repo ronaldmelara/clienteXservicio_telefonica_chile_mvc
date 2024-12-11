@@ -183,7 +183,8 @@ function ConfigCheckboxes(button, rowData) {
     const btn = $(button);
     // Obtener la fila que contiene el botón editado
     const row = btn.closest('tr');
-    const rut = rowData[0]; // Obtener el ID que está en la segunda celda (índice 1)
+    const rut = rowData["Rut"]; // Obtener el ID que está en la segunda celda (índice 1)
+    const dv = rowData["Dv"];
     // Encontrar todos los checkboxes dentro de la fila
     const checkboxes = row.find('input[type="checkbox"]');
     if (btn.attr("data-status") === 'none') {
@@ -207,7 +208,7 @@ function ConfigCheckboxes(button, rowData) {
     else if (btn.attr("data-status") === 'editing') {
         // Mostrar modal de confirmación antes de guardar
         showConfirmModal(() => {
-            saveChanges(checkboxes, rut);
+            saveChanges(checkboxes, rut, dv);
             btn.attr('data-status', "none");
             checkboxes.removeClass('enabled').addClass('disabled');
             btn.removeClass('btn-danger').addClass('btn-primary');
@@ -257,7 +258,7 @@ function saveContracts(elems) {
         });
     });
 }
-async function saveChanges(checkboxes, clientId) {
+async function saveChanges(checkboxes, clientId, dv) {
     let elems = [];
     checkboxes.each(function () {
         const _status = $(this).attr("data-status");
@@ -266,12 +267,11 @@ async function saveChanges(checkboxes, clientId) {
             const service = $(this).attr("data-key");
             const srvSelected = ListServices.find(srv => srv.service === service);
             if (srvSelected) {
-                elems.push({ idservice: srvSelected.idservice, rut: Number(clientId), active: (isChecked ? 1 : 0) });
+                elems.push({ idservice: srvSelected.idservice, rut: Number(clientId), active: (isChecked ? 1 : 0), dv: dv });
             }
         }
     });
     try {
-        debugger;
         const data = await saveContracts(elems); // Esperar la promesa
         console.log('Data saved successfully:', data);
         // Puedes mostrar un mensaje de éxito aquí

@@ -43,9 +43,9 @@ namespace ClienteServicio.Repository
             _customerContext.SaveChanges();
         }
 
-        public Customer GetCustomerByRut(int rut)
+        public Customer GetCustomerByRut(int rut, string dv)
         {
-            return _customerContext.Customers.FirstOrDefault(c=> c.rut == rut);
+            return _customerContext.Customers.FirstOrDefault(c=> c.rut == rut && c.dv == dv);
         }
     }
 }
