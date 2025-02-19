@@ -233,12 +233,16 @@ function loadTypeahead(): void {
 // Función para actualizar el estado de 'enable'
 async function updateServiceEnableStatus(serviceId: number, isEnabled: boolean): Promise<void> {
     try {
-        const response = await fetch(`/api/v1/services/${serviceId}/enable`, {
+        const response = await fetch(`/api/v1/services/status`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(isEnabled),
+            body: JSON.stringify({
+                idservice: serviceId,
+                enable: isEnabled ? 1 : 0
+            }),
+
         });
 
         if (!response.ok) {

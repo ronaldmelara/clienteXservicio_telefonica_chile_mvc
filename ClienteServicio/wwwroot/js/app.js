@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             /* scrollY: '400px',*/ // Ajusta la altura de la tabla si es necesario
             scrollCollapse: true,
             fixedColumns: {
-                start: 4 // Congela las dos primeras columnas
+                start: 3 // Congela las dos primeras columnas
             },
             responsive: true,
             layout: {
@@ -102,12 +102,75 @@ document.addEventListener('DOMContentLoaded', () => {
                                         return data;
                                     }
                                 }
+                            },
+                            customize: function (xlsx) {
+                                let sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                let styles = xlsx.xl['styles.xml'];
+                                console.log(sheet);
+                                // Definir desde qué columna empezar (columna 5 en este caso)
+                                let startIndex = 4; // Columnas en base 0, por lo que la columna 5 es el índice 4
+                                // Obtener número de filas y columnas
+                                let rowCount = $('row', sheet).length;
+                                // let colCount = $('row:eq(1) c', sheet).slice(startIndex).length;
+                                // Calcular la cantidad de columnas de la fila 2 (fila real con datos)
+                                let colCount = $('row:eq(1) c', sheet).length;
+                                // Inicializar array de sumatorias
+                                let totals = new Array(colCount).fill(0);
+                                // Recorrer las filas de la tabla y calcular totales (excluyendo la cabecera)
+                                table.rows({ search: 'applied' }).data().each(function (rowData, index) {
+                                    // Obtener claves de las columnas en cada iteración
+                                    let keys = Object.keys(rowData);
+                                    // Si totals no tiene tamaño aún, inicializar con ceros
+                                    if (totals.length === 0) {
+                                        totals = new Array(keys.length).fill(0);
+                                    }
+                                    // Recorrer desde la columna 5 en adelante
+                                    for (let i = startIndex; i < keys.length; i++) {
+                                        let key = keys[i]; // Obtener la clave de la columna
+                                        let value = rowData[key] === true ? 1 : 0; // Contar los "true" como 1
+                                        totals[i] += value;
+                                    }
+                                });
+                                // Crear estilos personalizados para la fila de totales
+                                let newStyleIndex = $('cellXfs xf', styles).length;
+                                // Agregar una nueva fuente en negrita con color blanco
+                                let newFontId = $('fonts font', styles).length;
+                                let newFont = `<font><b/><color rgb="FFFFFFFF"/></font>`; // Agregamos color blanco al texto
+                                $('fonts', styles).append(newFont);
+                                // Agregar un "fill" con fondo sólido negro
+                                let newFillId = $('fills fill', styles).length;
+                                let newFill = `<fill><patternFill patternType="solid"><fgColor rgb="FF000000"/><bgColor indexed="64"/></patternFill></fill>`;
+                                $('fills', styles).append(newFill);
+                                // Definir el nuevo estilo con negrita y fondo negro
+                                let newStyle = `<xf numFmtId="0" fontId="${newFontId}" fillId="${newFillId}" borderId="0" applyFont="1" applyFill="1"/>`;
+                                $('cellXfs', styles).append(newStyle);
+                                // Crear la nueva fila de sumatorias
+                                let sumRow = `<row r="${rowCount + 1}">`;
+                                for (let i = 0; i < colCount; i++) {
+                                    let cellValue = i === 0 ? "TOTAL" : (i >= startIndex ? totals[i] || "0" : "");
+                                    let cellRef = `${getExcelColumnName(i)}${rowCount + 1}`;
+                                    if (cellValue !== "") {
+                                        sumRow += `<c t="inlineStr" r="${cellRef}" s="${newStyleIndex}"><is><t>${cellValue}</t></is></c>`;
+                                    }
+                                }
+                                sumRow += `</row>`;
+                                // Insertar la fila de sumatoria en el XML
+                                $('sheetData', sheet).append(sumRow);
                             }
                         }
                     ]
                 }
             }
         });
+        // Función para obtener el nombre de la columna de Excel
+        function getExcelColumnName(colIndex) {
+            let columnName = "";
+            while (colIndex >= 0) {
+                columnName = String.fromCharCode((colIndex % 26) + 65) + columnName;
+                colIndex = Math.floor(colIndex / 26) - 1;
+            }
+            return columnName;
+        }
         $('#miTabla tbody').on('click', '.edit-btn', function () {
             const table = $('#miTabla').DataTable(); // Obtén la referencia al DataTable
             const btn = $(this); // El botón que se hizo clic

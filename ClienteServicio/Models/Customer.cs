@@ -10,12 +10,12 @@ namespace ClienteServicio.Models
         public string dv { get; set; }
         public string customer { get; set; }
 
-        public string rutdv
-        {
-            get
-            {
-                return rut.ToString() + "-" + dv;
-            }
-        }
+        //public string rutdv
+        //{
+        //    get
+        //    {
+        //        return rut.ToString() + "-" + dv;
+        //    }
+        //}
     }
 }

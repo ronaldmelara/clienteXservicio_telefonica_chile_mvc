@@ -90,7 +90,7 @@ function loadTableEvents(table: any): void {
         const newValue = row.find(".edit-input").val()?.toString().trim() || data.customer;
 
         // Guardar los cambios en el servidor (ejemplo usando fetch)
-        fetch(`/api/v1/customer/${data.rut}/name`, {
+        fetch(`/api/v1/customer/name`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

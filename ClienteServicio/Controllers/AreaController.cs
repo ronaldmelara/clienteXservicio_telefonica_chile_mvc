@@ -1,4 +1,5 @@
-﻿using ClienteServicio.Models;
+﻿using ClienteServicio.helpers;
+using ClienteServicio.Models;
 using ClienteServicio.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,13 +23,21 @@ namespace ClienteServicio.Controllers
         [HttpGet]
         public IActionResult GetAllAreas()
         {
-            List<Area> data = new List<Area>();
-            data = _areaRepository.GetAllAreas();
-            if (!data.Any())
+            try
             {
-                return NotFound();
+                List<Area> data = new List<Area>();
+                data = _areaRepository.GetAllAreas();
+                if (!data.Any())
+                {
+                    return NotFound(new { message = "Areas not found." });
+                }
+                return Ok(data);
             }
-            return Ok(data);
+            catch (Exception ex)
+            {
+                return StatusCode(Commons.GetStatusCodeFromException(ex), new { message = ex.Message });
+            }
+
         }
-    }
+    } 
 }

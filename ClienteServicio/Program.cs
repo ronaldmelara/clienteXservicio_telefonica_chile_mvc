@@ -63,6 +63,10 @@ app.UseAuthentication();
 app.UseSession();
 app.UseAuthorization();
 
+//manejo de Excepciones
+app.UseExceptionHandler("/Error/500");
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
+
 app.UseMiddleware<SessionValidationMiddleware>();
 
 app.MapControllerRoute(
